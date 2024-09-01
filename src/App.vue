@@ -1,0 +1,20 @@
+<script setup>
+</script>
+
+<template>
+  <Toast />
+  <header>
+    
+  </header>
+
+  <nav>
+    <Button as="router-link" to="/" label="Go to Home" />
+    <Button as="router-link" to="/dashboard" label="Go to Dashboard" />
+  </nav>
+
+  <main>
+    <RouterView />
+  </main>
+</template>
+
+<style scoped></style>
