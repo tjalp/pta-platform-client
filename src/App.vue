@@ -1,4 +1,5 @@
 <script setup>
+import SearchPta from './components/SearchPta.vue';
 </script>
 
 <template>
@@ -10,6 +11,7 @@
   <nav>
     <Button as="router-link" to="/" label="Go to Home" />
     <Button as="router-link" to="/dashboard" label="Go to Dashboard" />
+    <SearchPta />
   </nav>
 
   <main>

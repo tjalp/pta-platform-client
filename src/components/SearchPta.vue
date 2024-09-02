@@ -91,21 +91,25 @@ function filterLevels() {
 function search() {
     loading.value = true
 
-    fetch('https://pta.tjalp.net/api/pta/search?name=' + subject.value + '&level=' + level.value)
+    fetch('https://pta.tjalp.net/api/pta/search?name=' + encodeURIComponent(subject.value) + '&level=' + level.value)
         .then(response => {
             if (!response.ok) {
                 throw new Error('Failed to search PTA')
             }
             return response.json()
         }).then(data => {
+            if (!data) {
+                toast.add({ severity: 'error', summary: 'Foutmelding', detail: 'Kon het PTA niet vinden. Probeer het later opnieuw', life: 5000 })
+                return
+            }
             toast.add({ severity: 'success', summary: 'Succes', detail: 'Het PTA is gevonden', life: 5000 })
-            // router.push({ name: 'pta', params: { id: data['id'] } })
+            router.push({ name: 'pta', params: { id: data[0]['id'] } })
         }).catch(error => {
-            toast.add({ severity: 'error', summary: 'Foutmelding', detail: 'Kon het PTA niet vinden. Probeer het later opnieuw', life: 5000 })
+            toast.add({ severity: 'error', summary: 'Foutmelding', detail: `Er trad een fout op. Probeer het later opnieuw (${error.message})`, life: 5000 })
             console.error(error)
         }).finally(() => {
             loading.value = false
-            // dialogVisible.value = false
+            dialogVisible.value = false
         })
 }
 
