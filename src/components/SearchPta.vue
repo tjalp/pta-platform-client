@@ -1,32 +1,34 @@
 <template>
-    <Button label="PTA Zoeken" icon="pi pi-search" @click="dialogVisible = true" />
-    <Dialog v-model:visible="dialogVisible" modal header="PTA Zoeken" :style="{ width: '25rem' }">
-        <span class="text-surface-500 dark:text-surface-400 block mb-4">Vul de betreffende velden in.</span>
-        <div class="flex justify-center gap-4 mb-4">
-            <SelectButton v-model="view" :options="viewOptions" aria-labelledby="basic" />
-        </div>
-        <div v-if="view == 'Bewerken'">
-            <div class="flex items-center gap-4 mb-4">
-                <label for="username" class="font-semibold w-24">Afkorting</label>
-                <InputText id="username" v-model="username" class="flex-auto" autocomplete="off" placeholder="Afkorting" />
+    <!-- <Button label="PTA Zoeken" icon="pi pi-search" @click="dialogVisible = true" /> -->
+    <Dialog modal header="PTA Zoeken" :style="{ width: '25rem' }">
+        <form @submit.prevent="search">
+            <span class="text-surface-500 dark:text-surface-400 block mb-4">Vul de betreffende velden in.</span>
+            <div class="flex justify-center gap-4 mb-4">
+                <SelectButton v-model="view" :options="viewOptions" aria-labelledby="basic" />
+            </div>
+            <div v-if="view == 'Bewerken'">
+                <div class="flex items-center gap-4 mb-4">
+                    <label for="username" class="font-semibold w-24">Afkorting</label>
+                    <InputText id="username" v-model="username" class="flex-auto" autocomplete="off" placeholder="Afkorting" />
+                </div>
+                <div class="flex items-center gap-4 mb-4">
+                    <label for="password" class="font-semibold w-24">Wachtwoord</label>
+                    <Password id="password" v-model="password" class="flex-auto" autocomplete="off" :feedback="false" placeholder="Wachtwoord" />
+                </div>
             </div>
             <div class="flex items-center gap-4 mb-4">
-                <label for="password" class="font-semibold w-24">Wachtwoord</label>
-                <Password id="password" v-model="password" class="flex-auto" autocomplete="off" :feedback="false" placeholder="Wachtwoord" />
+                <label for="subject" class="font-semibold w-24">Vak</label>
+                <Select id="subject" v-model="subject" :options="filteredSubjectNames" required filter :loading="filteredSubjectNames == null" placeholder="Selecteer een Vak" class="flex-auto" />
             </div>
-        </div>
-        <div class="flex items-center gap-4 mb-4">
-            <label for="subject" class="font-semibold w-24">Vak</label>
-            <Select id="subject" v-model="subject" :options="filteredSubjectNames" filter :loading="filteredSubjectNames == null" placeholder="Selecteer een Vak" class="flex-auto" />
-        </div>
-        <div class="flex items-center gap-4 mb-8">
-            <label for="level" class="font-semibold w-24">Niveau</label>
-            <Select id="level" v-model="level" :options="filteredLevels" :loading="levels == null" placeholder="Selecteer een Niveau" class="flex-auto" />
-        </div>
-        <div class="flex justify-end gap-2">
-            <Button type="button" label="Annuleren" severity="secondary" @click="dialogVisible = false" />
-            <Button type="button" label="Zoeken" icon="pi pi-search" @click="search" :loading="loading" />
-        </div>
+            <div class="flex items-center gap-4 mb-8">
+                <label for="level" class="font-semibold w-24">Niveau</label>
+                <Select id="level" v-model="level" :options="filteredLevels" required :loading="levels == null" placeholder="Selecteer een Niveau" class="flex-auto" />
+            </div>
+            <div class="flex justify-end gap-2">
+                <Button type="button" label="Annuleren" severity="secondary" @click="$emit('manualVisibilityUpdate', false)" />
+                <Button type="submit" label="Zoeken" icon="pi pi-search" :loading="loading" />
+            </div>
+        </form>
     </Dialog>
 </template>
 
@@ -38,6 +40,8 @@ import { useRouter } from "vue-router";
 
 const toast = useToast()
 const router = useRouter()
+
+const emit = defineEmits(['manualVisibilityUpdate'])
 
 let subjects = []
 
@@ -109,7 +113,7 @@ function search() {
             console.error(error)
         }).finally(() => {
             loading.value = false
-            dialogVisible.value = false
+            emit('manualVisibilityUpdate', false)
         })
 }
 

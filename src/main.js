@@ -15,6 +15,7 @@ import Select from 'primevue/select';
 import ToastService from 'primevue/toastservice';
 import Toast from 'primevue/toast';
 import ProgressSpinner from 'primevue/progressspinner'
+import Menubar from 'primevue/menubar'
 
 const app = createApp(App)
 
@@ -81,5 +82,6 @@ app.component('Password', Password)
 app.component('Select', Select)
 app.component('Toast', Toast)
 app.component('ProgressSpinner', ProgressSpinner)
+app.component('Menubar', Menubar)
 
 app.mount('#app')
