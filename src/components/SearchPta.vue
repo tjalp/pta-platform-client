@@ -6,15 +6,13 @@
             <div class="flex justify-center gap-4 mb-4">
                 <SelectButton v-model="view" :options="viewOptions" aria-labelledby="basic" />
             </div>
-            <div v-if="view == 'Bewerken'">
-                <div class="flex items-center gap-4 mb-4">
-                    <label for="username" class="font-semibold w-24">Afkorting</label>
-                    <InputText id="username" v-model="username" class="flex-auto" autocomplete="off" placeholder="Afkorting" />
-                </div>
-                <div class="flex items-center gap-4 mb-4">
-                    <label for="password" class="font-semibold w-24">Wachtwoord</label>
-                    <Password id="password" v-model="password" class="flex-auto" autocomplete="off" :feedback="false" placeholder="Wachtwoord" />
-                </div>
+            <div class="flex items-center gap-4 mb-4">
+                <label for="username" class="font-semibold w-24">Afkorting</label>
+                <InputText id="username" v-model="username" class="flex-auto" autocomplete="off" :disabled="view != 'Bewerken'" placeholder="Afkorting" />
+            </div>
+            <div class="flex items-center gap-4 mb-4">
+                <label for="password" class="font-semibold w-24">Wachtwoord</label>
+                <Password id="password" v-model="password" class="flex-auto" autocomplete="off" :disabled="view != 'Bewerken'" :feedback="false" placeholder="Wachtwoord" />
             </div>
             <div class="flex items-center gap-4 mb-4">
                 <label for="subject" class="font-semibold w-24">Vak</label>
