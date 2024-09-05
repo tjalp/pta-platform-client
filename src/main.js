@@ -16,6 +16,8 @@ import ToastService from 'primevue/toastservice';
 import Toast from 'primevue/toast';
 import ProgressSpinner from 'primevue/progressspinner'
 import Menubar from 'primevue/menubar'
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
 
 const app = createApp(App)
 
@@ -83,5 +85,7 @@ app.component('Select', Select)
 app.component('Toast', Toast)
 app.component('ProgressSpinner', ProgressSpinner)
 app.component('Menubar', Menubar)
+app.component('DataTable', DataTable)
+app.component('Column', Column)
 
 app.mount('#app')
