@@ -1,12 +1,12 @@
 <template>
     <div class="flex justify-center">
-        <ProgressSpinner v-if="ptaData === null" />
+        <ProgressSpinner v-if="ptaData === null" style="width: 50px; height: 50px" strokeWidth="6" fill="transparent" />
         <div v-else>
             <div>
                 <Message severity="info">{{ ptaData.name + ' ' + ptaData.level }}</Message>
             </div>
             <div class="min-w-full p-8 rounded-lg border border-solid border-transparent">
-                <DataTable :value="ptaData.tests" tableStyle="min-width: 50rem">
+                <DataTable :value="ptaData.tests">
                     <Column field="id" header="Toetsnummer" />
                     <Column field="week" header="Week" />
                     <Column field="description" header="Omschrijving" />

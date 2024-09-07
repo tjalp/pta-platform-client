@@ -4,7 +4,7 @@
         <form @submit.prevent="search">
             <span class="text-surface-500 dark:text-surface-400 block mb-4">Vul de betreffende velden in.</span>
             <div class="flex justify-center gap-4 mb-4">
-                <SelectButton v-model="view" :options="viewOptions" aria-labelledby="basic" />
+                <SelectButton v-model="view" :options="viewOptions" :allowEmpty="false" aria-labelledby="basic" />
             </div>
             <div class="flex items-center gap-4 mb-4">
                 <label for="username" class="font-semibold w-24">Afkorting</label>
@@ -12,15 +12,19 @@
             </div>
             <div class="flex items-center gap-4 mb-4">
                 <label for="password" class="font-semibold w-24">Wachtwoord</label>
-                <Password id="password" v-model="password" class="flex-auto" autocomplete="off" :disabled="view != 'Bewerken'" :feedback="false" placeholder="Wachtwoord" />
+                <Password id="password" v-model="password" class="flex-auto" fluid autocomplete="off" :disabled="view != 'Bewerken'" :feedback="false" toggleMask placeholder="Wachtwoord" />
             </div>
             <div class="flex items-center gap-4 mb-4">
                 <label for="subject" class="font-semibold w-24">Vak</label>
                 <Select id="subject" v-model="subject" :options="filteredSubjectNames" required filter :loading="filteredSubjectNames == null" placeholder="Selecteer een Vak" class="flex-auto" />
             </div>
-            <div class="flex items-center gap-4 mb-8">
+            <div class="flex items-center gap-4 mb-4">
                 <label for="level" class="font-semibold w-24">Niveau</label>
                 <Select id="level" v-model="level" :options="filteredLevels" required :loading="levels == null" placeholder="Selecteer een Niveau" class="flex-auto" />
+            </div>
+            <div class="flex items-center gap-4 mb-8">
+                <label for="level" class="font-semibold w-24">Jaar</label>
+                <DatePicker id:="year" v-model="year" view="year" dateFormat="yy" showIcon iconDisplay="input" :disabled="view != 'Bekijken'" class="flex-auto" placeholder="Selecteer een Jaar" />
             </div>
             <div class="flex justify-end gap-2">
                 <Button type="button" label="Annuleren" severity="secondary" @click="$emit('manualVisibilityUpdate', false)" />
@@ -54,6 +58,7 @@ const username = ref(null)
 const password = ref(null)
 const subject = ref(null)
 const level = ref(null)
+const year = ref(new Date())
 const loading = ref(false)
 
 function getSubjects(responsible) {
@@ -93,10 +98,10 @@ function filterLevels() {
 function search() {
     loading.value = true
 
-    fetch('https://pta.tjalp.net/api/pta/search?name=' + encodeURIComponent(subject.value) + '&level=' + level.value)
+    fetch('https://pta.tjalp.net/api/pta/search?name=' + encodeURIComponent(subject.value) + '&level=' + level.value + '&year=' + year.value.getFullYear())
         .then(response => {
             if (!response.ok) {
-                throw new Error('Failed to search PTA')
+                throw new Error(response.status + ' ' + response.statusText)
             }
             return response.json()
         }).then(data => {
@@ -115,7 +120,10 @@ function search() {
         })
 }
 
-watch(view, () => filterSubjects())
+watch(view, () => {
+    year.value = new Date()
+    filterSubjects()
+})
 watch(username, () => filterSubjects())
 watch(subject, () => filterLevels())
 

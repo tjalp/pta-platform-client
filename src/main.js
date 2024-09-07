@@ -18,6 +18,7 @@ import ProgressSpinner from 'primevue/progressspinner'
 import Menubar from 'primevue/menubar'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
+import DatePicker from 'primevue/datepicker'
 
 const app = createApp(App)
 
@@ -87,5 +88,6 @@ app.component('ProgressSpinner', ProgressSpinner)
 app.component('Menubar', Menubar)
 app.component('DataTable', DataTable)
 app.component('Column', Column)
+app.component('DatePicker', DatePicker)
 
 app.mount('#app')
