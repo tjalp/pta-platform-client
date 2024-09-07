@@ -3,7 +3,7 @@
         <ProgressSpinner v-if="ptaData === null" style="width: 50px; height: 50px" strokeWidth="6" fill="transparent" />
         <div v-else>
             <div>
-                <Message severity="info">{{ ptaData.name + ' ' + ptaData.level }}</Message>
+                <Message severity="info">{{ ptaData.name + ' ' + ptaData.level + ' ' + ptaData.year }}</Message>
             </div>
             <div class="min-w-full p-8 rounded-lg border border-solid border-transparent">
                 <DataTable :value="ptaData.tests">
