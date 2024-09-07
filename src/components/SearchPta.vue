@@ -39,6 +39,9 @@ import { ref, watch } from "vue";
 import Dialog from "primevue/dialog";
 import { useToast } from 'primevue/usetoast'
 import { useRouter } from "vue-router";
+import DatePicker from "primevue/datepicker";
+import Password from "primevue/password";
+import SelectButton from "primevue/selectbutton";
 
 const toast = useToast()
 const router = useRouter()

@@ -22,6 +22,9 @@
 import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router';
 import { useToast } from 'primevue/usetoast'
+import ProgressBar from 'primevue/progressbar';
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
 
 const route = useRoute()
 const toast = useToast()

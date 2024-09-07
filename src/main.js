@@ -1,26 +1,19 @@
-import './assets/main.css'
 import 'primeicons/primeicons.css'
+import './assets/main.css'
 
-import { createApp } from 'vue'
-import App from './App.vue'
-import PrimeVue from 'primevue/config'
-import { definePreset } from '@primevue/themes';
+import { definePreset } from '@primevue/themes'
 import Aura from '@primevue/themes/aura'
 import Button from 'primevue/button'
-import InputText from 'primevue/inputtext';
-import router from './router';
-import SelectButton from 'primevue/selectbutton';
-import Password from 'primevue/password';
-import Select from 'primevue/select';
-import ToastService from 'primevue/toastservice';
-import Toast from 'primevue/toast';
-import ProgressSpinner from 'primevue/progressspinner'
+import PrimeVue from 'primevue/config'
+import InputText from 'primevue/inputtext'
 import Menubar from 'primevue/menubar'
-import DataTable from 'primevue/datatable'
-import Column from 'primevue/column'
-import DatePicker from 'primevue/datepicker'
 import Message from 'primevue/message'
-import ProgressBar from 'primevue/progressbar'
+import Select from 'primevue/select'
+import Toast from 'primevue/toast'
+import ToastService from 'primevue/toastservice'
+import { createApp } from 'vue'
+import App from './App.vue'
+import router from './router'
 
 const app = createApp(App)
 
@@ -82,16 +75,9 @@ app.use(ToastService);
 
 app.component('Button', Button)
 app.component('InputText', InputText)
-app.component('SelectButton', SelectButton)
-app.component('Password', Password)
 app.component('Select', Select)
 app.component('Toast', Toast)
-app.component('ProgressSpinner', ProgressSpinner)
 app.component('Menubar', Menubar)
-app.component('DataTable', DataTable)
-app.component('Column', Column)
-app.component('DatePicker', DatePicker)
 app.component('Message', Message)
-app.component('ProgressBar', ProgressBar)
 
 app.mount('#app')
