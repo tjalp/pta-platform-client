@@ -19,6 +19,8 @@ import Menubar from 'primevue/menubar'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import DatePicker from 'primevue/datepicker'
+import Message from 'primevue/message'
+import ProgressBar from 'primevue/progressbar'
 
 const app = createApp(App)
 
@@ -89,5 +91,7 @@ app.component('Menubar', Menubar)
 app.component('DataTable', DataTable)
 app.component('Column', Column)
 app.component('DatePicker', DatePicker)
+app.component('Message', Message)
+app.component('ProgressBar', ProgressBar)
 
 app.mount('#app')

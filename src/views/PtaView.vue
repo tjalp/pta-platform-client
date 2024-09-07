@@ -1,7 +1,7 @@
 <template>
-    <div class="flex justify-center">
-        <ProgressSpinner v-if="ptaData === null" style="width: 50px; height: 50px" strokeWidth="6" fill="transparent" />
-        <div v-else>
+    <ProgressBar v-if="ptaData === null" mode="indeterminate" style="height: 6px" />
+    <div v-else class="flex justify-center">
+        <div>
             <div>
                 <Message severity="info">{{ ptaData.name + ' ' + ptaData.level + ' ' + ptaData.year }}</Message>
             </div>
@@ -21,7 +21,6 @@
 <script setup>
 import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router';
-import Message from 'primevue/message';
 import { useToast } from 'primevue/usetoast'
 
 const route = useRoute()
