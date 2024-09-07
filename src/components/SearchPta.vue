@@ -50,7 +50,6 @@ const emit = defineEmits(['manualVisibilityUpdate'])
 
 let subjects = []
 
-const dialogVisible = ref(true);
 const viewOptions = ref(['Bekijken', 'Bewerken'])
 const filteredSubjectNames = ref(null)
 const filteredLevels = ref(null)
