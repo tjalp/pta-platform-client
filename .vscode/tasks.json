@@ -1,0 +1,27 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "npm",
+			"script": "dev",
+			"problemMatcher": [],
+			"label": "Run Development Server",
+			"detail": "Start a development server with hot reload"
+		},
+		{
+			"type": "npm",
+			"script": "preview",
+			"problemMatcher": [],
+			"label": "Run Preview Server",
+			"detail": "Start a preview server of the production build. Must be built first!"
+		},
+		{
+			"type": "npm",
+			"script": "build",
+			"group": "build",
+			"problemMatcher": [],
+			"label": "Build Production",
+			"detail": "Build the project for production. Test the build with 'Run Preview Server'"
+		}
+	]
+}
