@@ -24,7 +24,7 @@
             </div>
             <div class="flex items-center gap-4 mb-8">
                 <label for="level" class="font-semibold w-24">Jaar</label>
-                <DatePicker id:="year" v-model="year" view="year" dateFormat="yy" showIcon iconDisplay="input" :disabled="view != 'Bekijken'" class="flex-auto" placeholder="Selecteer een Jaar" />
+                <DatePicker id="year" v-model="year" view="year" dateFormat="yy" showIcon iconDisplay="input" :disabled="view != 'Bekijken'" class="flex-auto" placeholder="Selecteer een Jaar" />
             </div>
             <div class="flex justify-end gap-2">
                 <Button type="button" label="Annuleren" severity="secondary" @click="$emit('manualVisibilityUpdate', false)" />
