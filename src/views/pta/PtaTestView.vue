@@ -8,7 +8,7 @@
         </div>
         <div class="flex items-center gap-12 mb-4">
             <label for="type" class="font-semibold w-24">Afnamevorm</label>
-            <Select id="type" v-model="currentTest.type" :options="types" placeholder="Selecteer een Afnamevorm" disabled />
+            <Select id="type" v-model="computedTypes" :options="types" :loading="computedTypes === null || types === null" placeholder="Selecteer een Afnamevorm" disabled />
         </div>
         <div class="flex items-center gap-12 mb-4">
             <label for="subdomain" class="font-semibold w-24">Subdomein</label>
@@ -24,11 +24,13 @@
 <script setup>
 import Select from 'primevue/select';
 import { useRoute } from 'vue-router';
-import { ref, watch, computed } from 'vue';
+import { ref, watch, computed, onMounted } from 'vue';
 import InputNumber from 'primevue/inputnumber';
 import Textarea from 'primevue/textarea';
+import { useToast } from 'primevue/usetoast';
 
 const route = useRoute()
+const toast = useToast()
 
 const emit = defineEmits(['update-ptaData'])
 const props = defineProps({
@@ -42,10 +44,35 @@ const currentTest = computed(() => {
     return props.ptaData.tests.find(test => test.id === parseInt(route.params.testId));
 });
 
+const computedTypes = computed({
+    get: () => {
+        if (!types.value || !currentTest.value) return null
+        return types.value.find(type => type.toLowerCase() === currentTest.value.type.toLowerCase())
+    },
+    set: (value) => {
+        currentTest.value.type = value.toLowerCase()
+    }
+})
+
 const dates = ref(['SE 1', 'SE 2', 'SE 3', 'SE 4', 'Week'])
 const dateSelection = ref(null)
 const weekSelection = ref(null)
-const types = ref([]) // todo fetch types
+const types = ref(null)
+
+const fetchTypes = async () => {
+    try {
+        const response = await fetch('https://pta.tjalp.net/api/defaults/types');
+        const data = await response.json();
+        types.value = data;
+    } catch (error) {
+        console.error('Error fetching types:', error);
+        toast.add({ severity: 'error', summary: 'Fout bij ophalen van afnamevormen', detail: 'Er is een fout opgetreden bij het ophalen van de afnamevormen.' });
+    }
+};
+
+onMounted(() => {
+    fetchTypes();
+});
 
 watch(() => route.params.testId, (testId) => {
     const week = props.ptaData.tests.find(test => test.id === parseInt(testId)).week
