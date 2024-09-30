@@ -3,7 +3,7 @@
         <ProgressBar v-if="ptaData === null" mode="indeterminate" style="height: 6px" />
         <div v-else class="flex">
             <div>
-                <Menu :model="tests">
+                <Menu :model="menuItems">
                     <template #item="{ item, props }">
                         <RouterLink v-if="item.id" :to="{ name: 'pta-test', params: { id: ptaData.id, testId: item.id } }">
                             <a v-bind="props.action">
@@ -24,9 +24,9 @@
                 <!-- <div class="flex">
                     <Listbox v-if="ptaData.tests" v-model="selectedTest" :options="ptaData.tests" optionLabel="id" optionValue="id" />
                 </div> -->
-                <div class="flex flex-1 flex-col items-center">
+                <div class="flex flex-1 flex-col items-start ml-4 gap-4">
                     <div>
-                        <Message severity="info">{{ ptaData.name + ' ' + ptaData.level + ' ' + ptaData.year }}</Message>
+                        <Message severity="info">{{ ptaData.name + ' (' + ptaData.level + ', ' + ptaData.year + ')' }}</Message>
                     </div>
                     <RouterView :ptaData="ptaData" @update-ptaData="updatePtaData" />
                 </div>
@@ -46,11 +46,12 @@ const route = useRoute()
 const toast = useToast()
 
 const ptaData = ref(null)
-const tests = ref([
+const menuItems = ref([
     {
         label: 'Pagina\'s',
         items: [
-            { label: "Overzicht", icon: 'pi pi-fw pi-table', url: 'pta-overview' }
+            { label: "Overzicht", icon: 'pi pi-fw pi-table', url: 'pta-overview' },
+            { label: "Wegingen", icon: 'pi pi-fw pi-chart-bar', url: 'pta-weights' }
         ]
     },
     {
@@ -66,6 +67,8 @@ const tests = ref([
 function updatePtaData(data) {
     ptaData.value = data
 }
+
+
 
 // watch(() => route.params.testId, (testId) => {
 //     tests.value.forEach(item => {
@@ -90,6 +93,23 @@ watch(() => route.params.id, (id) => {
             toast.add({ severity: 'error', summary: 'Foutmelding', detail: 'Kon het PTA niet ophalen. Probeer het later opnieuw (' + error.message + ')', life: 5000 })
         })
 }, { immediate: true })
+
+// Update menu items when ptaData changes
+watch(ptaData, (data) => {
+    if (data === null) {
+        return;
+    }
+
+    const testCategory = menuItems.value.find(item => item.label === 'Toetsen')
+    
+    if (!testCategory) {
+        return;
+    }
+
+    testCategory.items = data.tests.map(test => {
+        return { label: test.id.toString(), icon: 'pi pi-fw pi-calendar', id: test.id }
+    })
+})
 </script>
 
 <style>

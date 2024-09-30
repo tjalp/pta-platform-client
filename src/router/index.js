@@ -19,6 +19,11 @@ const router = createRouter({
           component: () => import('../views/pta/PtaOverviewView.vue')
         },
         {
+          path: 'weights',
+          name: 'pta-weights',
+          component: () => import('../views/pta/PtaWeightsView.vue')
+        },
+        {
           path: 'test/:testId',
           name: 'pta-test',
           component: () => import('../views/pta/PtaTestView.vue')

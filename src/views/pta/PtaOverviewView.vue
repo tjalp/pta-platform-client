@@ -1,5 +1,5 @@
 <template>
-    <div class="min-w-full p-8 rounded-lg border border-solid border-transparent">
+    <div class="min-w-full rounded-lg border border-solid border-transparent">
         <DataTable :value="ptaData.tests" class="min-w-full">
             <Column field="id" header="Toetsnummer" />
             <Column field="week" header="Week" />
