@@ -112,7 +112,7 @@ function search() {
                 return
             }
             toast.add({ severity: 'success', summary: 'Succes', detail: 'Het PTA is gevonden', life: 5000 })
-            router.push({ name: 'pta', params: { id: data[0]['id'] } })
+            router.push({ name: 'pta-overview', params: { id: data[0]['id'] } })
         }).catch(error => {
             toast.add({ severity: 'error', summary: 'Foutmelding', detail: `Er trad een fout op. Probeer het later opnieuw (${error.message})`, life: 5000 })
             console.error(error)

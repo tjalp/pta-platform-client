@@ -11,17 +11,16 @@ const router = createRouter({
     },
     {
       path: '/pta/:id',
-      name: 'pta',
       component: () => import('../views/PtaView.vue'),
       children: [
         {
           path: '',
-          name: 'overview',
+          name: 'pta-overview',
           component: () => import('../views/pta/PtaOverviewView.vue')
         },
         {
           path: 'test/:testId',
-          name: 'test',
+          name: 'pta-test',
           component: () => import('../views/pta/PtaTestView.vue')
         }
       ]

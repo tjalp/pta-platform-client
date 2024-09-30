@@ -1,18 +1,35 @@
 <template>
-    <ProgressBar v-if="ptaData === null" mode="indeterminate" style="height: 6px" />
-    <div v-else class="flex justify-center">
-        <div>
+    <div>
+        <ProgressBar v-if="ptaData === null" mode="indeterminate" style="height: 6px" />
+        <div v-else class="flex">
             <div>
-                <Message severity="info">{{ ptaData.name + ' ' + ptaData.level + ' ' + ptaData.year }}</Message>
+                <Menu :model="tests">
+                    <template #item="{ item, props }">
+                        <RouterLink v-if="item.id" :to="{ name: 'pta-test', params: { id: ptaData.id, testId: item.id } }">
+                            <a v-bind="props.action">
+                                <span :class="item.icon" />
+                                <span class="ml-2">{{ item.label }}</span>
+                            </a>
+                        </RouterLink>
+                        <RouterLink v-if="item.url" :to="{ name: item.url }">
+                            <a v-bind="props.action">
+                                <span :class="item.icon" />
+                                <span class="ml-2">{{ item.label }}</span>
+                            </a>
+                        </RouterLink>
+                    </template>
+                </Menu>
             </div>
-            <div class="min-w-full p-8 rounded-lg border border-solid border-transparent">
-                <DataTable :value="ptaData.tests">
-                    <Column field="id" header="Toetsnummer" />
-                    <Column field="week" header="Week" />
-                    <Column field="description" header="Omschrijving" />
-                    <Column field="pod_weight" header="POD" />
-                    <Column field="pta_weight" header="PTA" />
-                </DataTable>
+            <div class="flex flex-1 justify-center items-start gap-20">
+                <!-- <div class="flex">
+                    <Listbox v-if="ptaData.tests" v-model="selectedTest" :options="ptaData.tests" optionLabel="id" optionValue="id" />
+                </div> -->
+                <div class="flex flex-1 flex-col items-center">
+                    <div>
+                        <Message severity="info">{{ ptaData.name + ' ' + ptaData.level + ' ' + ptaData.year }}</Message>
+                    </div>
+                    <RouterView :ptaData="ptaData" @update-ptaData="updatePtaData" />
+                </div>
             </div>
         </div>
     </div>
@@ -23,13 +40,38 @@ import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router';
 import { useToast } from 'primevue/usetoast'
 import ProgressBar from 'primevue/progressbar';
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
+import Menu from 'primevue/menu';
 
 const route = useRoute()
 const toast = useToast()
 
 const ptaData = ref(null)
+const tests = ref([
+    {
+        label: 'Pagina\'s',
+        items: [
+            { label: "Overzicht", icon: 'pi pi-fw pi-table', url: 'pta-overview' }
+        ]
+    },
+    {
+        label: 'Toetsen',
+        items: [
+            { label: '501', icon: 'pi pi-fw pi-calendar', id: 501 },
+            { label: '502', icon: 'pi pi-fw pi-calendar', id: 502 },
+            { label: '503', icon: 'pi pi-fw pi-calendar', id: 503 }
+        ]
+    }
+])
+
+function updatePtaData(data) {
+    ptaData.value = data
+}
+
+// watch(() => route.params.testId, (testId) => {
+//     tests.value.forEach(item => {
+//         item.class = item.id.toString().includes(testId) ? 'p-menuitem-active' : '';
+//     });
+// }, { immediate: true })
 
 watch(() => route.params.id, (id) => {
     // todo improve error handling
@@ -49,3 +91,9 @@ watch(() => route.params.id, (id) => {
         })
 }, { immediate: true })
 </script>
+
+<style>
+.p-menuitem-active {
+    background-color: aqua;
+}
+</style>
