@@ -9,6 +9,7 @@
         <div class="flex items-center gap-12 mb-4">
             <label for="type" class="font-semibold w-24">Afnamevorm</label>
             <Select id="type" v-model="computedTypes" :options="types" :loading="computedTypes === null || types === null" placeholder="Selecteer een Afnamevorm" disabled />
+            <InputText v-if="currentTest.type === 'anders'" v-model="currentTest.type_else" placeholder="Afnamevorm" disabled />
         </div>
         <div class="flex items-center gap-12 mb-4">
             <label for="subdomain" class="font-semibold w-24">Subdomein</label>
