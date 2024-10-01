@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h1>Toets {{ route.params.testId }}</h1>
+        <h1 class="text-2xl mb-4">Toets {{ route.params.testId }}</h1>
         <div class="flex items-center gap-12 mb-4">
             <label for="dateSelect" class="font-semibold w-24">Datum</label>
             <Select id="dateSelect" v-model="dateSelection" :options="dates" placeholder="Selecteer een Datum" disabled />
@@ -9,7 +9,12 @@
         <div class="flex items-center gap-12 mb-4">
             <label for="type" class="font-semibold w-24">Afnamevorm</label>
             <Select id="type" v-model="computedTypes" :options="types" :loading="computedTypes === null || types === null" placeholder="Selecteer een Afnamevorm" disabled />
-            <InputText v-if="currentTest.type === 'anders'" v-model="currentTest.type_else" placeholder="Afnamevorm" disabled />
+            <InputText v-if="currentTest.type === 'anders'" v-model="currentTest.type_else" placeholder="Afnamevorm" class="min-w-80" disabled />
+        </div>
+        <div class="flex items-center gap-12 mb-4">
+            <label for="duration" class="font-semibold w-24">Duur</label>
+            <Select id="duration" v-model="currentTest.time" optionLabel="label" optionValue="value" :options="formattedDurations" :loading="durations === null" placeholder="Selecteer een Afnameduur" disabled />
+            <InputText v-if="currentTest.time === 0" v-model="currentTest.time_else" placeholder="Tijd" class="min-w-80" disabled />
         </div>
         <div class="flex items-center gap-12 mb-4">
             <label for="subdomain" class="font-semibold w-24">Subdomein</label>
@@ -55,10 +60,24 @@ const computedTypes = computed({
     }
 })
 
+const formattedDurations = computed(() => {
+    if (!durations.value) return null
+    
+    const formatted = durations.value.map(duration => ({
+        label: `${duration} min.`,
+        value: duration
+    }))
+
+    formatted.push({ label: 'Anders', value: 0 })
+
+    return formatted
+})
+
 const dates = ref(['SE 1', 'SE 2', 'SE 3', 'SE 4', 'Week'])
 const dateSelection = ref(null)
 const weekSelection = ref(null)
 const types = ref(null)
+const durations = ref(null)
 
 const fetchTypes = async () => {
     try {
@@ -71,8 +90,20 @@ const fetchTypes = async () => {
     }
 };
 
+const fetchDurations = async () => {
+    try {
+        const response = await fetch('https://pta.tjalp.net/api/defaults/durations');
+        const data = await response.json();
+        durations.value = data;
+    } catch (error) {
+        console.error('Error fetching durations:', error);
+        toast.add({ severity: 'error', summary: 'Fout bij ophalen van afnameduur', detail: 'Er is een fout opgetreden bij het ophalen van de afnameduur.' });
+    }
+};
+
 onMounted(() => {
     fetchTypes();
+    fetchDurations();
 });
 
 watch(() => route.params.testId, (testId) => {
