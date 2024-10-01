@@ -22,7 +22,7 @@
         </div>
         <div class="flex items-center gap-12 mb-4">
             <label for="description" class="font-semibold w-24">Stofomschrijving</label>
-            <Textarea id="description" v-model="currentTest.description" placeholder="Stofomschrijving" rows="5" cols="60" autoResize disabled />
+            <Textarea id="description" v-model="currentTest.description" placeholder="Stofomschrijving" rows="2" cols="60" autoResize disabled />
         </div>
     </div>
 </template>
