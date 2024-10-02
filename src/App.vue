@@ -22,7 +22,7 @@
       </template>
       <template #end>
         <SearchPta v-model:visible="dialogVisible" @manual-visibility-update="(visible) => dialogVisible = visible" />
-        <Button icon="pi pi-sun" @click="onThemeToggler" />
+        <Button :icon @click="onThemeToggler" />
       </template>
     </Menubar>
   </nav>
@@ -35,9 +35,10 @@
 <script setup>
 import SearchPta from './components/SearchPta.vue';
 import ConfirmPopup from 'primevue/confirmpopup';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 
 const dialogVisible = ref(false);
+const icon = ref(document.getElementsByTagName('html')[0].classList.contains('p-dark') ? 'pi pi-fw pi-sun' : 'pi pi-fw pi-moon');
 
 const model = ref([
   {
@@ -61,6 +62,7 @@ function onThemeToggler() {
   const root = document.getElementsByTagName('html')[0];
 
   root.classList.toggle('p-dark');
+  icon.value = root.classList.contains('p-dark') ? 'pi pi-fw pi-sun' : 'pi pi-fw pi-moon';
 }
 </script>
 
