@@ -22,7 +22,7 @@
       </template>
       <template #end>
         <SearchPta v-model:visible="dialogVisible" @manual-visibility-update="(visible) => dialogVisible = visible" />
-        <Button :icon @click="onThemeToggler" />
+        <Button :icon @click="onThemeToggler" text />
       </template>
     </Menubar>
   </nav>

@@ -9,8 +9,8 @@
                 <div class="flex justify-between items-center">
                     <h1 class="text-2xl mb-4">Toets {{ route.params.testId }}</h1>
                     <div class="flex gap-4">
-                        <Button icon="pi pi-pen-to-square" label="Toggle Edit (temp)" @click="hasEditRights = !hasEditRights" />
-                        <Button v-if="hasEditRights" @click="confirmDelete($event)" label="Verwijderen" icon="pi pi-trash" severity="danger" />
+                        <Button icon="pi pi-pencil" label="Bewerken In-/Uitschaken" @click="hasEditRights = !hasEditRights" severity="secondary" text />
+                        <Button v-if="hasEditRights" @click="confirmDelete($event)" label="Verwijderen" icon="pi pi-trash" severity="danger" text />
                     </div>
                 </div>
                 <div class="flex items-center gap-12 mb-4">

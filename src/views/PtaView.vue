@@ -20,17 +20,25 @@
                     </template>
                 </Menu>
             </div>
-            <div class="flex flex-1 justify-center items-start gap-20">
-                <!-- <div class="flex">
-                    <Listbox v-if="ptaData.tests" v-model="selectedTest" :options="ptaData.tests" optionLabel="id" optionValue="id" />
-                </div> -->
-                <div class="flex flex-1 flex-col items-start ml-4 gap-4">
-                    <div>
-                        <Message severity="info">{{ ptaData.name + ' (' + ptaData.level + ', ' + ptaData.year + ')' }}</Message>
-                    </div>
-                    <div class="card">
-                        <RouterView :ptaData="ptaData" @update-ptaData="updatePtaData" />
-                    </div>
+            <!-- <div class="flex">
+                <Listbox v-if="ptaData.tests" v-model="selectedTest" :options="ptaData.tests" optionLabel="id" optionValue="id" />
+            </div> -->
+            <div class="flex flex-col ml-4 gap-4">
+                <div>
+                    <Toolbar>
+                        <template #start>
+                            <Button icon="pi pi-plus" class="mr-2" severity="secondary" label="Toets toevoegen" text @click="addTest" />
+                        </template>
+                        <template #center>
+                            <Message severity="info">{{ ptaData.name + ' (' + ptaData.level + ', ' + ptaData.year + ')' }}</Message>
+                        </template>
+                        <template #end>
+                            <Button icon="pi pi-save" class="mr-2" :loading="saving" severity="contrast" label="Opslaan" text @click="save" />
+                        </template>
+                    </Toolbar>
+                </div>
+                <div class="card">
+                    <RouterView :ptaData="ptaData" @update-ptaData="updatePtaData" />
                 </div>
             </div>
         </div>
@@ -42,12 +50,14 @@ import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router';
 import { useToast } from 'primevue/usetoast'
 import ProgressBar from 'primevue/progressbar';
+import Toolbar from 'primevue/toolbar';
 import Menu from 'primevue/menu';
 
 const route = useRoute()
 const toast = useToast()
 
 const ptaData = ref(null)
+const saving = ref(false)
 const menuItems = ref([
     {
         label: 'Pagina\'s',
@@ -64,6 +74,19 @@ const menuItems = ref([
 
 function updatePtaData(data) {
     ptaData.value = data
+}
+
+function addTest() {
+    toast.add({ severity: 'info', summary: 'Info', detail: 'Toets toevoegen is nog niet geïmplementeerd', life: 5000 })
+}
+
+function save() {
+    saving.value = true
+
+    setTimeout(() => {
+        saving.value = false
+        toast.add({ severity: 'info', summary: 'Info', detail: 'Opslaan is nog niet geïmplementeerd', life: 5000 })
+    }, 1000)
 }
 
 // watch(() => route.params.testId, (testId) => {
