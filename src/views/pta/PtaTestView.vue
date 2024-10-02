@@ -8,7 +8,7 @@
         </div>
         <div class="flex items-center gap-12 mb-4">
             <label for="type" class="font-semibold w-24">Afnamevorm</label>
-            <Select id="type" v-model="computedTypes" :options="types" :loading="computedTypes === null || types === null" placeholder="Selecteer een Afnamevorm" disabled />
+            <Select id="type" v-model="currentTest.type" optionLabel="label" optionValue="value" :options="formattedTypes" :loading="types === null" placeholder="Selecteer een Afnamevorm" disabled />
             <InputText v-if="currentTest.type === 'anders'" v-model="currentTest.type_else" placeholder="Afnamevorm" class="min-w-80" disabled />
         </div>
         <div class="flex items-center gap-12 mb-4">
@@ -50,14 +50,13 @@ const currentTest = computed(() => {
     return props.ptaData.tests.find(test => test.id === parseInt(route.params.testId));
 });
 
-const computedTypes = computed({
-    get: () => {
-        if (!types.value || !currentTest.value) return null
-        return types.value.find(type => type.toLowerCase() === currentTest.value.type.toLowerCase())
-    },
-    set: (value) => {
-        currentTest.value.type = value.toLowerCase()
-    }
+const formattedTypes = computed(() => {
+    if (!types.value) return null
+
+    return types.value.map(type => ({
+        label: type,
+        value: type.toLowerCase()
+    }))
 })
 
 const formattedDurations = computed(() => {
