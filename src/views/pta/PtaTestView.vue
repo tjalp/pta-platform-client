@@ -1,5 +1,5 @@
 <template>
-    <div class="card">
+    <div>
         <div v-if="!currentTest" class="flex justify-center items-center">
             <Message severity="error">Deze toets bestaat niet?</Message>
         </div>
@@ -19,12 +19,12 @@
             <div class="flex items-center gap-12 mb-4">
                 <label for="type" class="font-semibold w-24">Afnamevorm</label>
                 <Select id="type" v-model="currentTest.type" optionLabel="label" optionValue="value" :options="formattedTypes" :loading="types === null" placeholder="Selecteer een Afnamevorm" :disabled="!hasEditRights" />
-                <InputText v-if="currentTest.type === 'anders'" v-model="currentTest.type_else" placeholder="Afnamevorm" class="min-w-80" :disabled="!hasEditRights" />
+                <InputText v-if="currentTest.type === 'anders'" v-model="currentTest.type_else" placeholder="Andere afnamevorm" class="min-w-80" :disabled="!hasEditRights" />
             </div>
             <div class="flex items-center gap-12 mb-4">
                 <label for="duration" class="font-semibold w-24">Duur</label>
                 <Select id="duration" v-model="currentTest.time" optionLabel="label" optionValue="value" :options="formattedDurations" :loading="durations === null" placeholder="Selecteer een Afnameduur" :disabled="!hasEditRights" />
-                <InputText v-if="currentTest.time === 0" v-model="currentTest.time_else" placeholder="Tijd" class="min-w-80" :disabled="!hasEditRights" />
+                <InputText v-if="currentTest.time === 0" v-model="currentTest.time_else" placeholder="Andere tijd" class="min-w-80" :disabled="!hasEditRights" />
             </div>
             <div class="flex items-center justify-between gap-12 mb-4">
                 <div class="flex-1">

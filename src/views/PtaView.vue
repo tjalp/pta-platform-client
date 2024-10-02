@@ -28,7 +28,9 @@
                     <div>
                         <Message severity="info">{{ ptaData.name + ' (' + ptaData.level + ', ' + ptaData.year + ')' }}</Message>
                     </div>
-                    <RouterView :ptaData="ptaData" @update-ptaData="updatePtaData" />
+                    <div class="card">
+                        <RouterView :ptaData="ptaData" @update-ptaData="updatePtaData" />
+                    </div>
                 </div>
             </div>
         </div>
@@ -61,7 +63,6 @@ const menuItems = ref([
 ])
 
 function updatePtaData(data) {
-    console.log('Updating PTA data', data)
     ptaData.value = data
 }
 
@@ -91,8 +92,6 @@ watch(() => route.params.id, (id) => {
 
 // Update menu items when ptaData changes
 watch(ptaData, (data) => {
-    console.log('Updating menu items', data)
-
     if (data === null) {
         return;
     }
