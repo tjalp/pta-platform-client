@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="card">
         <div v-for="(weight, index) in ptaData.weights" :key="index">
             <InputGroup class="mb-4">
                 <InputNumber v-model="ptaData.weights[index]" :min="0" :max="100" :step="1" disabled />

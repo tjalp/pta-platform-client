@@ -21,6 +21,7 @@
       </template>
       <template #end>
         <SearchPta v-model:visible="dialogVisible" @manual-visibility-update="(visible) => dialogVisible = visible" />
+        <Button icon="pi pi-sun" @click="onThemeToggler" />
       </template>
     </Menubar>
   </nav>
@@ -53,6 +54,12 @@ const model = ref([
     command: () => dialogVisible.value = true
   }
 ])
+
+function onThemeToggler() {
+  const root = document.getElementsByTagName('html')[0];
+
+  root.classList.toggle('p-dark');
+}
 </script>
 
 <style scoped></style>

@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="card">
         <h1 class="text-2xl mb-4">Toets {{ route.params.testId }}</h1>
         <div class="flex items-center gap-12 mb-4">
             <label for="dateSelect" class="font-semibold w-24">Datum</label>

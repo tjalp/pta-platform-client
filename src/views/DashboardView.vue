@@ -1,3 +1,5 @@
 <template>
-    <Button label="Dashboard!" />
+    <div class="card">
+        <Button label="Dashboard!" />
+    </div>
 </template>
