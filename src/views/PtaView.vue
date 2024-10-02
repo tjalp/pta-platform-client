@@ -56,19 +56,14 @@ const menuItems = ref([
     },
     {
         label: 'Toetsen',
-        items: [
-            { label: '501', icon: 'pi pi-fw pi-calendar', id: 501 },
-            { label: '502', icon: 'pi pi-fw pi-calendar', id: 502 },
-            { label: '503', icon: 'pi pi-fw pi-calendar', id: 503 }
-        ]
+        items: []
     }
 ])
 
 function updatePtaData(data) {
+    console.log('Updating PTA data', data)
     ptaData.value = data
 }
-
-
 
 // watch(() => route.params.testId, (testId) => {
 //     tests.value.forEach(item => {
@@ -96,6 +91,8 @@ watch(() => route.params.id, (id) => {
 
 // Update menu items when ptaData changes
 watch(ptaData, (data) => {
+    console.log('Updating menu items', data)
+
     if (data === null) {
         return;
     }
@@ -109,11 +106,11 @@ watch(ptaData, (data) => {
     testCategory.items = data.tests.map(test => {
         return { label: test.id.toString(), icon: 'pi pi-fw pi-calendar', id: test.id }
     })
-})
+}, { deep: true })
 </script>
 
-<style>
+<!-- <style>
 .p-menuitem-active {
     background-color: aqua;
 }
-</style>
+</style> -->

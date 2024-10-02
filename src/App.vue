@@ -1,5 +1,6 @@
 <template>
   <Toast />
+  <ConfirmPopup />
   <header>
     
   </header>
@@ -33,6 +34,7 @@
 
 <script setup>
 import SearchPta from './components/SearchPta.vue';
+import ConfirmPopup from 'primevue/confirmpopup';
 import { ref } from 'vue';
 
 const dialogVisible = ref(false);

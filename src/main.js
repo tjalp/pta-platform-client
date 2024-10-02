@@ -11,6 +11,7 @@ import Message from 'primevue/message'
 import Select from 'primevue/select'
 import Toast from 'primevue/toast'
 import ToastService from 'primevue/toastservice'
+import ConfirmationService from 'primevue/confirmationservice'
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
@@ -31,6 +32,7 @@ app.use(PrimeVue, {
     }
 })
 app.use(AppState)
+app.use(ConfirmationService)
 app.use(ToastService)
 
 app.component('Button', Button)
