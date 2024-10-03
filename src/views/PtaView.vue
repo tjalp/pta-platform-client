@@ -23,7 +23,7 @@
             <!-- <div class="flex">
                 <Listbox v-if="ptaData.tests" v-model="selectedTest" :options="ptaData.tests" optionLabel="id" optionValue="id" />
             </div> -->
-            <div class="flex flex-col ml-4 gap-4">
+            <div class="flex flex-col ml-4 gap-4 flex-grow">
                 <div>
                     <Toolbar>
                         <template #start>
