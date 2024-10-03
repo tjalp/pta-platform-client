@@ -1,7 +1,7 @@
 <template>
     <div>
         <div v-if="!currentTest" class="flex justify-center items-center">
-            <Message severity="error">Deze toets bestaat niet?</Message>
+            <Message severity="error">Er bestaat geen toets met toetsnummer {{ route.params.testId }} voor deze PTA</Message>
         </div>
         <div v-else>
             <ProgressBar v-if="types === null || durations === null" mode="indeterminate" style="height: 6px" />
@@ -28,31 +28,31 @@
                     <Select id="duration" v-model="currentTest.time" optionLabel="label" optionValue="value" :options="formattedDurations" :loading="durations === null" placeholder="Selecteer een Afnameduur" :disabled="!hasEditRights" />
                     <InputText v-if="currentTest.time === 0" v-model="currentTest.time_else" placeholder="Andere tijd" class="min-w-80" :disabled="!hasEditRights" />
                 </div>
-                <div class="flex items-center justify-between gap-12 mb-4">
-                    <div class="flex-1">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div class="w-min">
                         <label for="result_type" class="font-semibold w-24">Beoordeling</label>
                         <Select id="result_type" v-model="currentTest.result_type" optionLabel="label" optionValue="value" :options="formattedResultTypes" placeholder="Selecteer een Beoordelingstype" :disabled="!hasEditRights" class="w-full" />
                     </div>
-                    <div class="flex-1">
+                    <div class="w-min">
                         <label for="pod_weight" class="font-semibold w-24">POD Weging</label>
                         <InputNumber id="pod_weight" v-model="currentTest.pod_weight" showButtons buttonLayout="horizontal" placeholder="Weging" :min="0" :step="1" :disabled="!hasEditRights" class="w-full" />
                     </div>
-                    <div class="flex-1">
+                    <div class="w-min">
                         <label for="pta_weight" class="font-semibold w-24">PTA Weging</label>
                         <InputNumber id="pta_weight" v-model="currentTest.pta_weight" showButtons buttonLayout="horizontal" placeholder="Weging" :min="0" :step="1" :disabled="!hasEditRights" class="w-full" />
                     </div>
-                    <div class="flex-1">
+                    <div class="w-min">
                         <label for="resitable" class="font-semibold w-24">Herkansbaar</label>
                         <ToggleButton id="resitable" v-model="currentTest.resitable" onLabel="Ja" offLabel="Nee" onIcon="pi pi-thumbs-up" offIcon="pi pi-thumbs-down" :disabled="!hasEditRights" class="w-full" />
                     </div>
                 </div>
                 <div class="flex items-center gap-12 mb-4">
                     <label for="subdomain" class="font-semibold w-24">Subdomein</label>
-                    <Textarea id="subdomain" v-model="currentTest.subdomain" placeholder="Subdomein" rows="2" cols="60" autoResize :disabled="!hasEditRights" />
+                    <Textarea id="subdomain" v-model="currentTest.subdomain" placeholder="Subdomein" rows="3" autoResize :disabled="!hasEditRights" class="flex-grow" />
                 </div>
                 <div class="flex items-center gap-12 mb-4">
                     <label for="description" class="font-semibold w-24">Stofomschrijving</label>
-                    <Textarea id="description" v-model="currentTest.description" placeholder="Stofomschrijving" rows="2" cols="60" autoResize :disabled="!hasEditRights" />
+                    <Textarea id="description" v-model="currentTest.description" placeholder="Stofomschrijving" rows="3" autoResize :disabled="!hasEditRights" class="flex-grow" />
                 </div>
             </div>
         </div>

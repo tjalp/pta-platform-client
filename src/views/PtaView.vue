@@ -47,13 +47,14 @@
 
 <script setup>
 import { ref, watch } from 'vue'
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useToast } from 'primevue/usetoast'
 import ProgressBar from 'primevue/progressbar';
 import Toolbar from 'primevue/toolbar';
 import Menu from 'primevue/menu';
 
 const route = useRoute()
+const router = useRouter()
 const toast = useToast()
 
 const ptaData = ref(null)
@@ -76,8 +77,15 @@ function updatePtaData(data) {
     ptaData.value = data
 }
 
-function addTest() {
-    toast.add({ severity: 'info', summary: 'Info', detail: 'Toets toevoegen is nog niet geïmplementeerd', life: 5000 })
+function addTest() {    
+    const lastTestId = Math.max(...ptaData.value.tests.map(test => test.id))
+    const newTestId = lastTestId + 1
+
+    ptaData.value.tests.push({ id: newTestId })
+
+    router.push({ name: 'pta-test', params: { id: ptaData.value.id, testId: newTestId } })
+
+    toast.add({ severity: 'success', summary: 'Succes', detail: `Nieuwe toets met toetsnummer ${newTestId} toegevoegd`, life: 3000 })
 }
 
 function save() {
@@ -128,6 +136,8 @@ watch(ptaData, (data) => {
     testCategory.items = data.tests.map(test => {
         return { label: test.id.toString(), icon: 'pi pi-fw pi-calendar', id: test.id }
     })
+
+    console.log(testCategory.items)
 }, { deep: true })
 </script>
 
