@@ -34,6 +34,7 @@
                         </template>
                         <template #end>
                             <div class="flex gap-4">
+                                <Button icon="pi pi-download" label="Exporteren" text severity="secondary" as="a" :href="`https://pta.tjalp.net/api/pta/${ptaData.id}/export`" target="_blank" rel="noopener" />
                                 <Button v-if="hasEditRights" icon="pi pi-save" class="mr-2" :loading="saving" label="Opslaan" @click="save" text />
                                 <Button :icon="hasEditRights ? 'pi pi-fw pi-eye' : 'pi pi-fw pi-pencil'" :label="hasEditRights ? 'Bekijken' : 'Bewerken'" @click="hasEditRights = !hasEditRights" severity="info" text />
                             </div>
