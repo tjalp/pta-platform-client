@@ -33,12 +33,15 @@
                             <Message severity="info">{{ ptaData.name + ' (' + ptaData.level + ', ' + ptaData.year + ')' }}</Message>
                         </template>
                         <template #end>
-                            <Button icon="pi pi-save" class="mr-2" :loading="saving" severity="contrast" label="Opslaan" text @click="save" />
+                            <div class="flex gap-4">
+                                <Button v-if="hasEditRights" icon="pi pi-save" class="mr-2" :loading="saving" label="Opslaan" @click="save" text />
+                                <Button :icon="hasEditRights ? 'pi pi-fw pi-eye' : 'pi pi-fw pi-pencil'" :label="hasEditRights ? 'Bekijken' : 'Bewerken'" @click="hasEditRights = !hasEditRights" severity="info" text />
+                            </div>
                         </template>
                     </Toolbar>
                 </div>
                 <div class="card">
-                    <RouterView :ptaData="ptaData" @update-ptaData="updatePtaData" />
+                    <RouterView :ptaData :hasEditRights @update-ptaData="updatePtaData" />
                 </div>
             </div>
         </div>
@@ -59,6 +62,7 @@ const toast = useToast()
 
 const ptaData = ref(null)
 const saving = ref(false)
+const hasEditRights = ref(false)
 const menuItems = ref([
     {
         label: 'Pagina\'s',
@@ -78,7 +82,17 @@ function updatePtaData(data) {
 }
 
 function addTest() {    
-    const lastTestId = Math.max(...ptaData.value.tests.map(test => test.id))
+    let lastTestId = Math.max(...ptaData.value.tests.map(test => test.id), 0)
+
+    if (lastTestId === 0) {
+        const match = ptaData.value.level.match(/\d+/)
+        if (!match) {
+            toast.add({ severity: 'error', summary: 'Foutmelding', detail: 'Kon het nieuwe toetsnummer niet bepalen. Neem contact op met een administrator', life: 10000 })
+            return
+        }
+        lastTestId = parseInt(match + '00', 10)
+    }
+
     const newTestId = lastTestId + 1
 
     ptaData.value.tests.push({ id: newTestId })

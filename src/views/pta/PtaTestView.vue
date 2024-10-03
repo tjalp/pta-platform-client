@@ -8,10 +8,7 @@
             <div v-else>
                 <div class="flex justify-between items-center">
                     <h1 class="text-2xl mb-4">Toets {{ route.params.testId }}</h1>
-                    <div class="flex gap-4">
-                        <Button icon="pi pi-pencil" label="Bewerken In-/Uitschaken" @click="hasEditRights = !hasEditRights" severity="secondary" text />
-                        <Button v-if="hasEditRights" @click="confirmDelete($event)" label="Verwijderen" icon="pi pi-trash" severity="danger" text />
-                    </div>
+                    <Button v-if="hasEditRights" @click="confirmDelete($event)" label="Verwijderen" icon="pi pi-trash" severity="danger" text />
                 </div>
                 <div class="flex items-center gap-12 mb-4">
                     <label for="dateSelect" class="font-semibold w-24">Datum</label>
@@ -21,12 +18,12 @@
                 <div class="flex items-center gap-12 mb-4">
                     <label for="type" class="font-semibold w-24">Afnamevorm</label>
                     <Select id="type" v-model="currentTest.type" optionLabel="label" optionValue="value" :options="formattedTypes" :loading="types === null" placeholder="Selecteer een Afnamevorm" :disabled="!hasEditRights" />
-                    <InputText v-if="currentTest.type === 'anders'" v-model="currentTest.type_else" placeholder="Andere afnamevorm" class="min-w-80" :disabled="!hasEditRights" />
+                    <InputText v-if="currentTest.type === 'anders'" v-model="currentTest.type_else" placeholder="Andere afnamevorm" class="flex-grow" :disabled="!hasEditRights" />
                 </div>
                 <div class="flex items-center gap-12 mb-4">
                     <label for="duration" class="font-semibold w-24">Duur</label>
                     <Select id="duration" v-model="currentTest.time" optionLabel="label" optionValue="value" :options="formattedDurations" :loading="durations === null" placeholder="Selecteer een Afnameduur" :disabled="!hasEditRights" />
-                    <InputText v-if="currentTest.time === 0" v-model="currentTest.time_else" placeholder="Andere tijd" class="min-w-80" :disabled="!hasEditRights" />
+                    <InputText v-if="currentTest.time === 0" v-model="currentTest.time_else" placeholder="Andere tijd" class="flex-grow" :disabled="!hasEditRights" />
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <div class="w-min">
@@ -35,11 +32,11 @@
                     </div>
                     <div class="w-min">
                         <label for="pod_weight" class="font-semibold w-24">POD Weging</label>
-                        <InputNumber id="pod_weight" v-model="currentTest.pod_weight" showButtons buttonLayout="horizontal" placeholder="Weging" :min="0" :step="1" :disabled="!hasEditRights" class="w-full" />
+                        <InputNumber id="pod_weight" v-model="currentTest.pod_weight" showButtons buttonLayout="horizontal" placeholder="POD weging" :min="0" :step="1" :disabled="!hasEditRights" class="w-full" />
                     </div>
                     <div class="w-min">
                         <label for="pta_weight" class="font-semibold w-24">PTA Weging</label>
-                        <InputNumber id="pta_weight" v-model="currentTest.pta_weight" showButtons buttonLayout="horizontal" placeholder="Weging" :min="0" :step="1" :disabled="!hasEditRights" class="w-full" />
+                        <InputNumber id="pta_weight" v-model="currentTest.pta_weight" showButtons buttonLayout="horizontal" placeholder="PTA weging" :min="0" :step="1" :disabled="!hasEditRights" class="w-full" />
                     </div>
                     <div class="w-min">
                         <label for="resitable" class="font-semibold w-24">Herkansbaar</label>
@@ -80,6 +77,11 @@ const props = defineProps({
     ptaData: {
         type: Object,
         required: true
+    },
+    hasEditRights: {
+        type: Boolean,
+        required: false,
+        default: false
     }
 })
 
@@ -153,7 +155,6 @@ const dateSelection = ref(null)
 const weekSelection = ref(null)
 const types = ref(null)
 const durations = ref(null)
-const hasEditRights = ref(false)
 
 const fetchTypes = async () => {
     try {

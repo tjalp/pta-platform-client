@@ -1,7 +1,7 @@
 <template>
     <div v-for="(weight, index) in ptaData.weights" :key="index">
         <InputGroup class="mb-4">
-            <InputNumber v-model="ptaData.weights[index]" :min="0" :max="100" :step="1" disabled />
+            <InputNumber v-model="ptaData.weights[index]" :min="0" :max="100" :step="1" :disabled="!hasEditRights" />
             <InputGroupAddon>%</InputGroupAddon>
         </InputGroup>
     </div>
@@ -16,6 +16,11 @@ const props = defineProps({
     ptaData: {
         type: Object,
         required: true
+    },
+    hasEditRights: {
+        type: Boolean,
+        required: false,
+        default: false
     }
 })
 </script>
