@@ -10,44 +10,44 @@
                     <h1 class="text-2xl mb-4">Toets {{ route.params.testId }}</h1>
                     <Button v-if="hasEditRights" @click="confirmDelete($event)" label="Verwijderen" icon="pi pi-trash" severity="danger" text />
                 </div>
-                <div class="flex items-center gap-12 mb-4">
+                <div class="flex flex-wrap items-center gap-12 mb-4">
                     <label for="dateSelect" class="font-semibold w-24">Datum</label>
                     <Select id="dateSelect" v-model="dateSelection" :options="dates" placeholder="Selecteer een Datum" :disabled="!hasEditRights" />
                     <InputNumber v-if="dateSelection === 'Week'" v-model="weekSelection" showButtons buttonLayout="horizontal" :min="1" :max="52" :step="1" placeholder="Weeknummer" :disabled="!hasEditRights" />
                 </div>
-                <div class="flex items-center gap-12 mb-4">
+                <div class="flex flex-wrap items-center gap-12 mb-4">
                     <label for="type" class="font-semibold w-24">Afnamevorm</label>
                     <Select id="type" v-model="currentTest.type" optionLabel="label" optionValue="value" :options="formattedTypes" :loading="types === null" placeholder="Selecteer een Afnamevorm" :disabled="!hasEditRights" />
                     <InputText v-if="currentTest.type === 'anders'" v-model="currentTest.type_else" placeholder="Andere afnamevorm" class="flex-grow" :disabled="!hasEditRights" />
                 </div>
-                <div class="flex items-center gap-12 mb-4">
+                <div class="flex flex-wrap items-center gap-12 mb-4">
                     <label for="duration" class="font-semibold w-24">Duur</label>
                     <Select id="duration" v-model="currentTest.time" optionLabel="label" optionValue="value" :options="formattedDurations" :loading="durations === null" placeholder="Selecteer een Afnameduur" :disabled="!hasEditRights" />
                     <InputText v-if="currentTest.time === 0" v-model="currentTest.time_else" placeholder="Andere tijd" class="flex-grow" :disabled="!hasEditRights" />
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div class="w-min">
-                        <label for="result_type" class="font-semibold w-24">Beoordeling</label>
+                <div class="flex flex-wrap gap-4 mb-4">
+                    <div class="flex-auto">
+                        <label for="result_type" class="font-semibold block mb-2">Beoordeling</label>
                         <Select id="result_type" v-model="currentTest.result_type" optionLabel="label" optionValue="value" :options="formattedResultTypes" placeholder="Selecteer een Beoordelingstype" :disabled="!hasEditRights" class="w-full" />
                     </div>
-                    <div class="w-min">
-                        <label for="pod_weight" class="font-semibold w-24">POD Weging</label>
+                    <div class="flex-auto">
+                        <label for="pod_weight" class="font-semibold block mb-2">POD Weging</label>
                         <InputNumber id="pod_weight" v-model="currentTest.pod_weight" showButtons buttonLayout="horizontal" placeholder="POD weging" :min="0" :step="1" :disabled="!hasEditRights" class="w-full" />
                     </div>
-                    <div class="w-min">
-                        <label for="pta_weight" class="font-semibold w-24">PTA Weging</label>
+                    <div class="flex-auto">
+                        <label for="pta_weight" class="font-semibold block mb-2">PTA Weging</label>
                         <InputNumber id="pta_weight" v-model="currentTest.pta_weight" showButtons buttonLayout="horizontal" placeholder="PTA weging" :min="0" :step="1" :disabled="!hasEditRights" class="w-full" />
                     </div>
-                    <div class="w-min">
-                        <label for="resitable" class="font-semibold w-24">Herkansbaar</label>
+                    <div class="flex-auto">
+                        <label for="resitable" class="font-semibold block mb-2">Herkansbaar</label>
                         <ToggleButton id="resitable" v-model="currentTest.resitable" onLabel="Ja" offLabel="Nee" onIcon="pi pi-thumbs-up" offIcon="pi pi-thumbs-down" :disabled="!hasEditRights" class="w-full" />
                     </div>
                 </div>
-                <div class="flex items-center gap-12 mb-4">
+                <div class="flex flex-wrap items-center gap-12 mb-4">
                     <label for="subdomain" class="font-semibold w-24">Subdomein</label>
                     <Textarea id="subdomain" v-model="currentTest.subdomain" placeholder="Subdomein" rows="3" autoResize :disabled="!hasEditRights" class="flex-grow" />
                 </div>
-                <div class="flex items-center gap-12 mb-4">
+                <div class="flex flex-wrap items-center gap-12 mb-4">
                     <label for="description" class="font-semibold w-24">Stofomschrijving</label>
                     <Textarea id="description" v-model="currentTest.description" placeholder="Stofomschrijving" rows="3" autoResize :disabled="!hasEditRights" class="flex-grow" />
                 </div>
