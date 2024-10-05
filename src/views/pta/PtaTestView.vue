@@ -4,7 +4,7 @@
             <Message severity="error">Er bestaat geen toets met toetsnummer {{ route.params.testId }} voor deze PTA</Message>
         </div>
         <div v-else>
-            <ProgressBar v-if="types === null || durations === null" mode="indeterminate" style="height: 6px" />
+            <ProgressBar v-if="props.types === null || props.durations === null" mode="indeterminate" style="height: 6px" />
             <div v-else>
                 <div class="flex justify-between items-center">
                     <h1 class="text-2xl mb-4">Toets {{ route.params.testId }}</h1>
@@ -17,12 +17,12 @@
                 </div>
                 <div class="flex flex-wrap items-center gap-12 mb-4">
                     <label for="type" class="font-semibold w-24">Afnamevorm</label>
-                    <Select id="type" v-model="currentTest.type" optionLabel="label" optionValue="value" :options="formattedTypes" :loading="types === null" placeholder="Selecteer een Afnamevorm" :disabled="!hasEditRights" />
+                    <Select id="type" v-model="currentTest.type" optionLabel="label" optionValue="value" :options="formattedTypes" :loading="props.types === null" placeholder="Selecteer een Afnamevorm" :disabled="!hasEditRights" />
                     <InputText v-if="currentTest.type === 'anders'" v-model="currentTest.type_else" placeholder="Andere afnamevorm" class="flex-grow" :disabled="!hasEditRights" />
                 </div>
                 <div class="flex flex-wrap items-center gap-12 mb-4">
                     <label for="duration" class="font-semibold w-24">Duur</label>
-                    <Select id="duration" v-model="currentTest.time" optionLabel="label" optionValue="value" :options="formattedDurations" :loading="durations === null" placeholder="Selecteer een Afnameduur" :disabled="!hasEditRights" />
+                    <Select id="duration" v-model="currentTest.time" optionLabel="label" optionValue="value" :options="formattedDurations" :loading="props.durations === null" placeholder="Selecteer een Afnameduur" :disabled="!hasEditRights" />
                     <InputText v-if="currentTest.time === 0" v-model="currentTest.time_else" placeholder="Andere tijd" class="flex-grow" :disabled="!hasEditRights" />
                 </div>
                 <div class="flex flex-wrap gap-4 mb-4">
@@ -82,6 +82,16 @@ const props = defineProps({
         type: Boolean,
         required: false,
         default: false
+    },
+    types: {
+        type: Array,
+        required: true,
+        default: null
+    },
+    durations: {
+        type: Array,
+        required: true,
+        default: null
     }
 })
 
@@ -92,18 +102,18 @@ const currentTest = computed(() => {
 });
 
 const formattedTypes = computed(() => {
-    if (!types.value) return null
+    if (!props.types) return null
 
-    return types.value.map(type => ({
+    return props.types.map(type => ({
         label: type,
         value: type.toLowerCase()
     }))
 })
 
 const formattedDurations = computed(() => {
-    if (!durations.value) return null
+    if (!props.durations) return null
     
-    const formatted = durations.value.map(duration => ({
+    const formatted = props.durations.map(duration => ({
         label: `${duration} min.`,
         value: duration
     }))
@@ -153,37 +163,6 @@ const confirmDelete = (event) => {
 const dates = ref(['SE 1', 'SE 2', 'SE 3', 'SE 4', 'Week'])
 const dateSelection = ref(null)
 const weekSelection = ref(null)
-const types = ref(null)
-const durations = ref(null)
-
-const fetchTypes = async () => {
-    try {
-        const response = await fetch('https://pta.tjalp.net/api/defaults/types');
-        const data = await response.json();
-        types.value = data;
-    } catch (error) {
-        console.error('Error fetching types:', error);
-        toast.add({ severity: 'error', summary: 'Fout bij ophalen van afnamevormen', detail: 'Er is een fout opgetreden bij het ophalen van de afnamevormen.' });
-    }
-};
-
-const fetchDurations = async () => {
-    try {
-        const response = await fetch('https://pta.tjalp.net/api/defaults/durations');
-        const data = await response.json();
-        durations.value = data;
-    } catch (error) {
-        console.error('Error fetching durations:', error);
-        toast.add({ severity: 'error', summary: 'Fout bij ophalen van afnameduur', detail: 'Er is een fout opgetreden bij het ophalen van de afnameduur.' });
-    }
-};
-
-onMounted(() => {
-    if (!currentTest) return
-
-    fetchTypes();
-    fetchDurations();
-});
 
 watch(() => route.params.testId, (newTestId) => {
     if (!props.ptaData.tests || !props.ptaData.tests.find(test => test.id === parseInt(newTestId))) return

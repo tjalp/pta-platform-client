@@ -1,6 +1,6 @@
 <template>
     <div>
-        <ProgressBar v-if="ptaData === null" mode="indeterminate" style="height: 6px" />
+        <ProgressBar v-if="ptaData === null || types === null || durations === null" mode="indeterminate" style="height: 6px" />
         <div v-else class="flex">
             <div>
                 <Menu :model="menuItems">
@@ -42,7 +42,7 @@
                     </Toolbar>
                 </div>
                 <div class="card">
-                    <RouterView :ptaData :hasEditRights @update-ptaData="updatePtaData" />
+                    <RouterView :ptaData :types :durations :hasEditRights @update-ptaData="updatePtaData" />
                 </div>
             </div>
         </div>
@@ -50,7 +50,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router';
 import { useToast } from 'primevue/usetoast'
 import ProgressBar from 'primevue/progressbar';
@@ -64,6 +64,8 @@ const toast = useToast()
 const ptaData = ref(null)
 const saving = ref(false)
 const hasEditRights = ref(false)
+const types = ref(null)
+const durations = ref(null)
 const menuItems = ref([
     {
         label: 'Pagina\'s',
@@ -112,6 +114,28 @@ function save() {
     }, 1000)
 }
 
+const fetchTypes = async () => {
+    try {
+        const response = await fetch('https://pta.tjalp.net/api/defaults/types');
+        const data = await response.json();
+        types.value = data;
+    } catch (error) {
+        console.error('Error fetching types:', error);
+        toast.add({ severity: 'error', summary: 'Fout bij ophalen van afnamevormen', detail: 'Er is een fout opgetreden bij het ophalen van de afnamevormen.' });
+    }
+};
+
+const fetchDurations = async () => {
+    try {
+        const response = await fetch('https://pta.tjalp.net/api/defaults/durations');
+        const data = await response.json();
+        durations.value = data;
+    } catch (error) {
+        console.error('Error fetching durations:', error);
+        toast.add({ severity: 'error', summary: 'Fout bij ophalen van afnameduur', detail: 'Er is een fout opgetreden bij het ophalen van de afnameduur.' });
+    }
+};
+
 // watch(() => route.params.testId, (testId) => {
 //     tests.value.forEach(item => {
 //         item.class = item.id.toString().includes(testId) ? 'p-menuitem-active' : '';
@@ -152,6 +176,11 @@ watch(ptaData, (data) => {
         return { label: test.id.toString(), icon: 'pi pi-fw pi-calendar', id: test.id }
     })
 }, { deep: true })
+
+onMounted(() => {
+    fetchTypes();
+    fetchDurations();
+});
 </script>
 
 <!-- <style>
