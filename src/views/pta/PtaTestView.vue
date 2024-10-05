@@ -4,7 +4,7 @@
             <Message severity="error">Er bestaat geen toets met toetsnummer {{ route.params.testId }} voor deze PTA</Message>
         </div>
         <div v-else>
-            <ProgressBar v-if="props.types === null || props.durations === null" mode="indeterminate" style="height: 6px" />
+            <ProgressBar v-if="props.types === null || props.durations === null || props.resultTypes === null" mode="indeterminate" style="height: 6px" />
             <div v-else>
                 <div class="flex justify-between items-center">
                     <h1 class="text-2xl mb-4">Toets {{ route.params.testId }}</h1>
@@ -92,6 +92,11 @@ const props = defineProps({
         type: Array,
         required: true,
         default: null
+    },
+    resultTypes: {
+        type: Array,
+        required: true,
+        default: null
     }
 })
 
@@ -124,13 +129,12 @@ const formattedDurations = computed(() => {
 })
 
 const formattedResultTypes = computed(() => {
-    return [{
-        label: 'Cijfer',
-        value: 'cijfer'
-    }, {
-        label: 'O/V/G',
-        value: 'o/v/g'
-    }]
+    if (!props.resultTypes) return null
+
+    return props.resultTypes.map(type => ({
+        label: type,
+        value: type.toLowerCase()
+    }))
 })
 
 const confirmDelete = (event) => {

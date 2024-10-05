@@ -1,6 +1,6 @@
 <template>
     <div>
-        <ProgressBar v-if="ptaData === null || types === null || durations === null" mode="indeterminate" style="height: 6px" />
+        <ProgressBar v-if="ptaData === null || types === null || durations === null || resultTypes === null" mode="indeterminate" style="height: 6px" />
         <div v-else class="flex">
             <div>
                 <Menu :model="menuItems">
@@ -42,7 +42,7 @@
                     </Toolbar>
                 </div>
                 <div class="card">
-                    <RouterView :ptaData :types :durations :hasEditRights @update-ptaData="updatePtaData" />
+                    <RouterView :ptaData :types :durations :resultTypes :hasEditRights @update-ptaData="updatePtaData" />
                 </div>
             </div>
         </div>
@@ -66,6 +66,7 @@ const saving = ref(false)
 const hasEditRights = ref(false)
 const types = ref(null)
 const durations = ref(null)
+const resultTypes = ref(['Cijfer', 'O/V/G']) // Todo fetch from API
 const menuItems = ref([
     {
         label: 'Pagina\'s',

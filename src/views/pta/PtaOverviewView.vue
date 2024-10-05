@@ -25,6 +25,9 @@
                 <template v-if="col.field === 'type'" #body="slotProps">
                     {{ types.find(type => type.toLowerCase() === slotProps.data.type.toLowerCase()) }}
                 </template>
+                <template v-if="col.field === 'result_type'" #body="slotProps">
+                    {{ resultTypes.find(type => type.toLowerCase() === slotProps.data.result_type.toLowerCase()) }}
+                </template>
             </Column>
         </DataTable>
     </div>
@@ -45,13 +48,18 @@ const props = defineProps({
     types: {
         type: Array,
         required: true
+    },
+    resultTypes: {
+        type: Array,
+        required: true
     }
 })
 
 const columns = ref([
     { header: 'Week', field: 'week', default: true },
     { header: 'Omschrijving', field: 'description', default: true },
-    { header: 'Type', field: 'type', default: false },
+    { header: 'Afnamevorm', field: 'type', default: false },
+    { header: 'Beoordeling', field: 'result_type', default: false },
     { header: 'Herkansbaar', field: 'resitable', default: false },
     { header: 'POD', field: 'pod_weight', default: true },
     { header: 'PTA', field: 'pta_weight', default: true }
