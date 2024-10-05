@@ -151,8 +151,6 @@ watch(ptaData, (data) => {
     testCategory.items = data.tests.map(test => {
         return { label: test.id.toString(), icon: 'pi pi-fw pi-calendar', id: test.id }
     })
-
-    console.log(testCategory.items)
 }, { deep: true })
 </script>
 

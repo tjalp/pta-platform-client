@@ -198,4 +198,20 @@ watch(() => route.params.testId, (newTestId) => {
         weekSelection.value = null
     }
 }, { immediate: true })
+
+watch(() => dateSelection.value, (newDateSelection) => {
+    if (newDateSelection === 'Week') {
+        currentTest.value.week = weekSelection.value ? weekSelection.value.toString() : "0"
+    } else {
+        currentTest.value.week = newDateSelection
+    }
+
+    console.log(currentTest.value)
+})
+
+watch(weekSelection, (newWeekSelection) => {
+    if (newWeekSelection === null) return
+
+    currentTest.value.week = newWeekSelection.toString()
+})
 </script>
