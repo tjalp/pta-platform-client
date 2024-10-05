@@ -57,6 +57,7 @@ const props = defineProps({
 
 const columns = ref([
     { header: 'Week', field: 'week', default: true },
+    { header: 'Subdomein', field: 'subdomain', default: false },
     { header: 'Omschrijving', field: 'description', default: true },
     { header: 'Afnamevorm', field: 'type', default: false },
     { header: 'Beoordeling', field: 'result_type', default: false },

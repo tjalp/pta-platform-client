@@ -196,7 +196,7 @@ watch(weekSelection, (newWeekSelection) => {
     currentTest.value.week = newWeekSelection.toString()
 })
 
-watch(() => currentTest.value.result_type, (newResultType) => {
+watch(() => currentTest?.value?.result_type, (newResultType) => {
     if (!newResultType) return
 
     if (newResultType.toLowerCase() === 'o/v/g') {
