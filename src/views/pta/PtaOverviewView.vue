@@ -1,24 +1,14 @@
 <template>
-    <div class="min-w-full">
-        <DataTable :value="ptaData.tests" class="min-w-full">
+    <div>
+        <DataTable :value="ptaData.tests" scrollable scrollHeight="1024px">
             <template #header>
                 <div style="text-align:left">
-                    <MultiSelect :modelValue="selectedColumns" :options="columns" optionLabel="header" @update:modelValue="onToggle"
-                        display="chip" placeholder="Selecteer Kolommen" />
+                    <MultiSelect :modelValue="selectedColumns" :options="columns" :maxSelectedLabels="3" filter optionLabel="header" @update:modelValue="onToggle"
+                        placeholder="Selecteer Kolommen" class="w-full md:w-96" />
                 </div>
             </template>
             <Column field="id" header="Nummer" />
-            <!-- <Column field="week" header="Week" />
-            <Column field="description" header="Omschrijving" />
-            <Column field="type" header="Type" />
-            <Column field="resitable" header="Herkansbaar">
-                <template #body="slotProps">
-                    {{ slotProps.data.resitable ? 'Ja' : 'Nee' }}
-                </template>
-            </Column>
-            <Column field="pod_weight" header="POD" />
-            <Column field="pta_weight" header="PTA" /> -->
-            <Column v-for="(col, index) of selectedColumns" :field="col.field" :header="col.header" :key="col.field + '_' + index">
+            <Column v-for="(col, index) of selectedColumns" :field="col.field" :header="col.header" :key="col.field + '_' + index" :class="{'min-w-96': col.field === 'description'}">
                 <template v-if="col.field === 'resitable'" #body="slotProps">
                     {{ slotProps.data.resitable ? 'Ja' : 'Nee' }}
                 </template>
