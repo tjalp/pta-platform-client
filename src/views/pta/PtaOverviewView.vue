@@ -7,7 +7,7 @@
                         display="chip" placeholder="Selecteer Kolommen" />
                 </div>
             </template>
-            <Column field="id" header="Toetsnummer" />
+            <Column field="id" header="Nummer" />
             <!-- <Column field="week" header="Week" />
             <Column field="description" header="Omschrijving" />
             <Column field="type" header="Type" />

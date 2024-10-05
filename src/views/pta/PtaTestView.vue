@@ -28,13 +28,13 @@
                 <div class="flex flex-wrap gap-4 mb-4">
                     <div class="flex-auto">
                         <label for="result_type" class="font-semibold block mb-2">Beoordeling</label>
-                        <Select id="result_type" v-model="currentTest.result_type" optionLabel="label" optionValue="value" :options="formattedResultTypes" placeholder="Selecteer een Beoordelingstype" :disabled="!hasEditRights" class="w-full" />
+                        <Select id="result_type" v-model="resultType" optionLabel="label" optionValue="value" :options="formattedResultTypes" placeholder="Selecteer een Beoordelingstype" :disabled="!hasEditRights" class="w-full" />
                     </div>
-                    <div class="flex-auto">
+                    <div v-if="currentTest.result_type.toLowerCase() === 'cijfer'" class="flex-auto">
                         <label for="pod_weight" class="font-semibold block mb-2">POD Weging</label>
                         <InputNumber id="pod_weight" v-model="currentTest.pod_weight" showButtons buttonLayout="horizontal" placeholder="POD weging" :min="0" :step="1" :disabled="!hasEditRights" class="w-full" />
                     </div>
-                    <div class="flex-auto">
+                    <div v-if="currentTest.result_type.toLowerCase() === 'cijfer'" class="flex-auto">
                         <label for="pta_weight" class="font-semibold block mb-2">PTA Weging</label>
                         <InputNumber id="pta_weight" v-model="currentTest.pta_weight" showButtons buttonLayout="horizontal" placeholder="PTA weging" :min="0" :step="1" :disabled="!hasEditRights" class="w-full" />
                     </div>
@@ -105,6 +105,11 @@ const currentTest = computed(() => {
 
     return props.ptaData.tests.find(test => test.id === parseInt(route.params.testId));
 });
+
+const resultType = computed({
+    get: () => currentTest.value.result_type,
+    set: (value) => currentTest.value.result_type = value
+})
 
 const formattedTypes = computed(() => {
     if (!props.types) return null
@@ -196,5 +201,12 @@ watch(weekSelection, (newWeekSelection) => {
     if (newWeekSelection === null) return
 
     currentTest.value.week = newWeekSelection.toString()
+})
+
+watch(resultType, (newResultType) => {
+    if (newResultType.toLowerCase() === 'o/v/g') {
+        currentTest.value.pod_weight = 0
+        currentTest.value.pta_weight = 0
+    }
 })
 </script>
