@@ -2,9 +2,10 @@
     <div>
         <DataTable :value="ptaData.tests" scrollable>
             <template #header>
-                <div style="text-align:left">
+                <div class="flex justify-between items-center">
                     <MultiSelect :modelValue="selectedColumns" :options="columns" :maxSelectedLabels="3" filter optionLabel="header" @update:modelValue="onToggle"
                         placeholder="Selecteer Kolommen" class="w-full md:w-96" />
+                    <Button icon="pi pi-sort-alt" label="Sorteren" severity="secondary" @click="sortTests" :disabled="sorting" />
                 </div>
             </template>
             <Column field="id" header="Nummer">
@@ -34,8 +35,10 @@ import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import MultiSelect from 'primevue/multiselect';
 import { ref } from 'vue';
+import { useToast } from 'primevue/usetoast';
 
 const emit = defineEmits(['update-ptaData'])
+const toast = useToast()
 const props = defineProps({
     ptaData: {
         type: Object,
@@ -65,4 +68,16 @@ const selectedColumns = ref(columns.value.filter(col => col.default));
 const onToggle = (val) => {
     selectedColumns.value = columns.value.filter(col => val.includes(col));
 };
+
+const sorting = ref(false)
+
+function sortTests() {
+    sorting.value = true
+
+    setTimeout(() => {
+        sorting.value = false
+    }, 1000)
+
+    toast.add({ severity: 'success', summary: 'Succes', detail: `De toetsen zijn gesorteerd (grapje, want nog niet geimplementeerd)`, life: 3000 });
+}
 </script>
