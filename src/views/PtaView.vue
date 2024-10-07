@@ -48,8 +48,8 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router';
+import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
+import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router';
 import { useToast } from 'primevue/usetoast'
 import ProgressBar from 'primevue/progressbar';
 import Toolbar from 'primevue/toolbar';
@@ -65,6 +65,7 @@ const hasEditRights = ref(false)
 const types = ref(null)
 const durations = ref(null)
 const resultTypes = ref(['Cijfer', 'O/V/G']) // Todo fetch from API
+const isEdited = ref(false) // Todo make this actually do something
 const menuItems = ref([
     {
         label: 'Pagina\'s',
@@ -113,6 +114,20 @@ function save() {
     }, 1000)
 }
 
+const fetchPtaData = async (id) => {
+    try {
+        const response = await fetch(`https://pta.tjalp.net/api/pta/${id}`)
+        if (!response.ok) {
+            throw new Error(response.statusText)
+        }
+        const data = await response.json()
+        ptaData.value = data
+    } catch (error) {
+        console.error('Error:', error)
+        toast.add({ severity: 'error', summary: 'Foutmelding', detail: 'Kon het PTA niet ophalen. Probeer het later opnieuw (' + error.message + ')', life: 5000 })
+    }
+}
+
 const fetchTypes = async () => {
     try {
         const response = await fetch('https://pta.tjalp.net/api/defaults/types');
@@ -135,34 +150,19 @@ const fetchDurations = async () => {
     }
 };
 
-// watch(() => route.params.testId, (testId) => {
-//     tests.value.forEach(item => {
-//         item.class = item.id.toString().includes(testId) ? 'p-menuitem-active' : '';
-//     });
-// }, { immediate: true })
-
 watch(() => route.params.id, (id) => {
-    // todo improve error handling
     ptaData.value = null
-    fetch(`https://pta.tjalp.net/api/pta/${id}`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(response.statusText);
-            }
-            return response;
-        })
-        .then(response => response.json())
-        .then(data => ptaData.value = data)
-        .catch(error => {
-            console.error('Error:', error);
-            toast.add({ severity: 'error', summary: 'Foutmelding', detail: 'Kon het PTA niet ophalen. Probeer het later opnieuw (' + error.message + ')', life: 5000 })
-        })
+    fetchPtaData(id)
 }, { immediate: true })
 
-// Update menu items when ptaData changes
-watch(ptaData, (data) => {
+watch(ptaData, (data, oldData) => {
     if (data === null) {
         return;
+    }
+
+    if (oldData !== null) {
+        // See todo above
+        // isEdited.value = true
     }
 
     const testCategory = menuItems.value.find(item => item.label === 'Toetsen')
@@ -176,14 +176,33 @@ watch(ptaData, (data) => {
     })
 }, { deep: true })
 
+const handleBeforeUnload = (event) => {
+    if (isEdited.value || saving.value) {
+        event.preventDefault();
+        event.returnValue = '';
+    }
+};
+
 onMounted(() => {
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
     fetchTypes();
     fetchDurations();
 });
-</script>
 
-<!-- <style>
-.p-menuitem-active {
-    background-color: aqua;
-}
-</style> -->
+onBeforeUnmount(() => {
+  window.removeEventListener('beforeunload', handleBeforeUnload)
+})
+
+onBeforeRouteLeave((to, from, next) => {
+    if (isEdited.value || saving.value) {
+        if (confirm('Er zijn onopgeslagen wijzigingen. Weet je zeker dat je de pagina wilt verlaten?')) {
+            next();
+        } else {
+            next(false);
+        }
+    } else {
+        next();
+    }
+})
+</script>

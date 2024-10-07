@@ -1,11 +1,12 @@
 <template>
+    <ConfirmPopup />
     <div>
         <DataTable :value="ptaData.tests" scrollable>
             <template #header>
                 <div class="flex justify-between items-center">
                     <MultiSelect :modelValue="selectedColumns" :options="columns" :maxSelectedLabels="3" filter optionLabel="header" @update:modelValue="onToggle"
                         placeholder="Selecteer Kolommen" class="w-full md:w-96" />
-                    <Button v-if="hasEditRights" icon="pi pi-sort-alt" label="Sorteren" severity="secondary" @click="sortTests" :disabled="sorting" />
+                    <Button v-if="hasEditRights" icon="pi pi-sort-alt" label="Sorteren" severity="secondary" @click="confirmSort($event)" :disabled="sorting" />
                 </div>
             </template>
             <Column field="id" header="Nummer">
@@ -36,9 +37,12 @@ import Column from 'primevue/column';
 import MultiSelect from 'primevue/multiselect';
 import { ref } from 'vue';
 import { useToast } from 'primevue/usetoast';
+import { useConfirm } from 'primevue/useconfirm';
+import ConfirmPopup from 'primevue/confirmpopup';
 
 const emit = defineEmits(['update-ptaData'])
 const toast = useToast()
+const confirm = useConfirm()
 const props = defineProps({
     ptaData: {
         type: Object,
@@ -74,6 +78,23 @@ const onToggle = (val) => {
 };
 
 const sorting = ref(false)
+
+const confirmSort = (event) => {
+    confirm.require({
+        target: event.currentTarget,
+        message: 'Wil je alle toetsen sorteren? Dit verandert toetsnummers.',
+        icon: 'pi pi-info-circle',
+        rejectProps: {
+            label: 'Annuleren',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Sorteren'
+        },
+        accept: sortTests
+    });
+};
 
 function sortTests() {
     sorting.value = true

@@ -1,4 +1,5 @@
 <template>
+    <ConfirmPopup />
     <div>
         <div v-if="!currentTest" class="flex justify-center items-center">
             <Message severity="error">Er bestaat geen toets met toetsnummer {{ route.params.testId }} voor deze PTA</Message>
@@ -66,6 +67,7 @@ import ProgressBar from 'primevue/progressbar';
 import ToggleButton from 'primevue/togglebutton';
 import { useToast } from 'primevue/usetoast';
 import { useConfirm } from 'primevue/useconfirm';
+import ConfirmPopup from 'primevue/confirmpopup';
 
 const route = useRoute()
 const router = useRouter()

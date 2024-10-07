@@ -1,6 +1,5 @@
 <template>
   <Toast />
-  <ConfirmPopup />
   <header>
     
   </header>
@@ -34,8 +33,7 @@
 
 <script setup>
 import SearchPta from './components/SearchPta.vue';
-import ConfirmPopup from 'primevue/confirmpopup';
-import { ref, computed } from 'vue';
+import { ref } from 'vue';
 
 const dialogVisible = ref(false);
 const icon = ref(document.getElementsByTagName('html')[0].classList.contains('p-dark') ? 'pi pi-fw pi-sun' : 'pi pi-fw pi-moon');
