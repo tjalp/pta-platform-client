@@ -12,44 +12,44 @@
                 </div>
                 <div class="flex flex-wrap items-center gap-12 mb-4">
                     <label for="dateSelect" class="font-semibold w-24">Datum</label>
-                    <Select id="dateSelect" v-model="dateSelection" :options="dates" placeholder="Selecteer een Datum" :disabled="!hasEditRights" />
+                    <Select id="dateSelect" v-model="dateSelection" :options="dates" placeholder="Datum" :disabled="!hasEditRights" class="w-full max-w-48" />
                     <InputNumber v-if="dateSelection === 'Week'" v-model="weekSelection" showButtons buttonLayout="horizontal" :min="1" :max="52" :step="1" placeholder="Weeknummer" :disabled="!hasEditRights" />
                 </div>
                 <div class="flex flex-wrap items-center gap-12 mb-4">
                     <label for="type" class="font-semibold w-24">Afnamevorm</label>
-                    <Select id="type" v-model="currentTest.type" optionLabel="label" optionValue="value" :options="formattedTypes" :loading="props.types === null" placeholder="Selecteer een Afnamevorm" :disabled="!hasEditRights" />
-                    <InputText v-if="currentTest.type === 'anders'" v-model="currentTest.type_else" placeholder="Andere afnamevorm" class="flex-grow" :disabled="!hasEditRights" />
+                    <Select id="type" v-model="currentTest.type" optionLabel="label" optionValue="value" :options="formattedTypes" :loading="props.types === null" placeholder="Afnamevorm" :disabled="!hasEditRights" class="w-full max-w-48" />
+                    <InputText v-if="currentTest.type === 'anders'" v-model="currentTest.type_else" placeholder="Andere afnamevorm" :disabled="!hasEditRights" class="w-full max-w-xl" />
                 </div>
                 <div class="flex flex-wrap items-center gap-12 mb-4">
                     <label for="duration" class="font-semibold w-24">Duur</label>
-                    <Select id="duration" v-model="currentTest.time" optionLabel="label" optionValue="value" :options="formattedDurations" :loading="props.durations === null" placeholder="Selecteer een Afnameduur" :disabled="!hasEditRights" />
-                    <InputText v-if="currentTest.time === 0" v-model="currentTest.time_else" placeholder="Andere tijd" class="flex-grow" :disabled="!hasEditRights" />
+                    <Select id="duration" v-model="currentTest.time" optionLabel="label" optionValue="value" :options="formattedDurations" :loading="props.durations === null" placeholder="Afnameduur" :disabled="!hasEditRights" class="w-full max-w-48" />
+                    <InputText v-if="currentTest.time === 0" v-model="currentTest.time_else" placeholder="Andere tijd" :disabled="!hasEditRights" class="w-full max-w-xl" />
                 </div>
                 <div class="flex flex-wrap gap-4 mb-4">
                     <div class="flex-auto">
                         <label for="result_type" class="font-semibold block mb-2">Beoordeling</label>
-                        <Select id="result_type" v-model="currentTest.result_type" optionLabel="label" optionValue="value" :options="formattedResultTypes" placeholder="Selecteer een Beoordelingstype" :disabled="!hasEditRights" class="w-full" />
+                        <Select id="result_type" v-model="currentTest.result_type" optionLabel="label" optionValue="value" :options="formattedResultTypes" placeholder="Beoordelingstype" :disabled="!hasEditRights" class="w-full max-w-48" />
                     </div>
                     <div v-if="currentTest.result_type && currentTest.result_type.toLowerCase() === 'cijfer'" class="flex-auto">
                         <label for="pod_weight" class="font-semibold block mb-2">POD Weging</label>
-                        <InputNumber id="pod_weight" v-model="currentTest.pod_weight" showButtons buttonLayout="horizontal" placeholder="POD weging" :min="0" :step="1" :disabled="!hasEditRights" class="w-full" />
+                        <InputNumber id="pod_weight" v-model="currentTest.pod_weight" showButtons buttonLayout="horizontal" placeholder="POD weging" :min="0" :step="1" :disabled="!hasEditRights" />
                     </div>
                     <div v-if="currentTest.result_type && currentTest.result_type.toLowerCase() === 'cijfer'" class="flex-auto">
                         <label for="pta_weight" class="font-semibold block mb-2">PTA Weging</label>
-                        <InputNumber id="pta_weight" v-model="currentTest.pta_weight" showButtons buttonLayout="horizontal" placeholder="PTA weging" :min="0" :step="1" :disabled="!hasEditRights" class="w-full" />
+                        <InputNumber id="pta_weight" v-model="currentTest.pta_weight" showButtons buttonLayout="horizontal" placeholder="PTA weging" :min="0" :step="1" :disabled="!hasEditRights" />
                     </div>
                     <div class="flex-auto">
                         <label for="resitable" class="font-semibold block mb-2">Herkansbaar</label>
-                        <ToggleButton id="resitable" v-model="currentTest.resitable" onLabel="Ja" offLabel="Nee" onIcon="pi pi-thumbs-up" offIcon="pi pi-thumbs-down" :disabled="!hasEditRights" class="w-full" />
+                        <ToggleButton id="resitable" v-model="currentTest.resitable" onLabel="Ja" offLabel="Nee" onIcon="pi pi-thumbs-up" offIcon="pi pi-thumbs-down" :disabled="!hasEditRights" class="w-full max-w-32" />
                     </div>
                 </div>
                 <div class="flex flex-wrap items-center gap-12 mb-4">
                     <label for="subdomain" class="font-semibold w-24">Subdomein</label>
-                    <Textarea id="subdomain" v-model="currentTest.subdomain" placeholder="Subdomein" rows="3" autoResize :disabled="!hasEditRights" class="flex-grow" />
+                    <Textarea id="subdomain" v-model="currentTest.subdomain" placeholder="Subdomein" rows="3" autoResize :disabled="!hasEditRights" class="w-full max-w-2xl" />
                 </div>
                 <div class="flex flex-wrap items-center gap-12 mb-4">
                     <label for="description" class="font-semibold w-24">Stofomschrijving</label>
-                    <Textarea id="description" v-model="currentTest.description" placeholder="Stofomschrijving" rows="3" autoResize :disabled="!hasEditRights" class="flex-grow" />
+                    <Textarea id="description" v-model="currentTest.description" placeholder="Stofomschrijving" rows="3" autoResize :disabled="!hasEditRights" class="w-full max-w-2xl" />
                 </div>
             </div>
         </div>
