@@ -1,13 +1,19 @@
 <template>
     <div>
-        <DataTable :value="ptaData.tests" scrollable scrollHeight="1024px">
+        <DataTable :value="ptaData.tests" scrollable>
             <template #header>
                 <div style="text-align:left">
                     <MultiSelect :modelValue="selectedColumns" :options="columns" :maxSelectedLabels="3" filter optionLabel="header" @update:modelValue="onToggle"
                         placeholder="Selecteer Kolommen" class="w-full md:w-96" />
                 </div>
             </template>
-            <Column field="id" header="Nummer" />
+            <Column field="id" header="Nummer">
+                <template #body="slotProps">
+                    <RouterLink :to="{ name: 'pta-test', params: { testId: slotProps.data.id } }">
+                        {{ slotProps.data.id }}
+                    </RouterLink>
+                </template>
+            </Column>
             <Column v-for="(col, index) of selectedColumns" :field="col.field" :header="col.header" :key="col.field + '_' + index" :class="{'min-w-96': col.field === 'description'}">
                 <template v-if="col.field === 'resitable'" #body="slotProps">
                     {{ slotProps.data.resitable ? 'Ja' : 'Nee' }}
