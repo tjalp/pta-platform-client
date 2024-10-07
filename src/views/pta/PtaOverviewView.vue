@@ -17,13 +17,13 @@
             </Column>
             <Column v-for="(col, index) of selectedColumns" :field="col.field" :header="col.header" :key="col.field + '_' + index" :class="{'min-w-96': col.field === 'description'}">
                 <template v-if="col.field === 'resitable'" #body="slotProps">
-                    {{ slotProps.data.resitable ? 'Ja' : 'Nee' }}
+                    {{ slotProps.data?.resitable ? 'Ja' : 'Nee' }}
                 </template>
                 <template v-if="col.field === 'type'" #body="slotProps">
-                    {{ types.find(type => type.toLowerCase() === slotProps.data.type.toLowerCase()) }}
+                    {{ types.find(type => type.toLowerCase() === slotProps.data?.type?.toLowerCase()) }}
                 </template>
                 <template v-if="col.field === 'result_type'" #body="slotProps">
-                    {{ resultTypes.find(type => type.toLowerCase() === slotProps.data.result_type.toLowerCase()) }}
+                    {{ resultTypes.find(type => type.toLowerCase() === slotProps.data?.result_type?.toLowerCase()) }}
                 </template>
             </Column>
         </DataTable>
