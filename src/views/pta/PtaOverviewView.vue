@@ -5,7 +5,7 @@
                 <div class="flex justify-between items-center">
                     <MultiSelect :modelValue="selectedColumns" :options="columns" :maxSelectedLabels="3" filter optionLabel="header" @update:modelValue="onToggle"
                         placeholder="Selecteer Kolommen" class="w-full md:w-96" />
-                    <Button icon="pi pi-sort-alt" label="Sorteren" severity="secondary" @click="sortTests" :disabled="sorting" />
+                    <Button v-if="hasEditRights" icon="pi pi-sort-alt" label="Sorteren" severity="secondary" @click="sortTests" :disabled="sorting" />
                 </div>
             </template>
             <Column field="id" header="Nummer">
@@ -50,6 +50,10 @@ const props = defineProps({
     },
     resultTypes: {
         type: Array,
+        required: true
+    },
+    hasEditRights: {
+        type: Boolean,
         required: true
     }
 })
