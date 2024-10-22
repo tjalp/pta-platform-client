@@ -75,7 +75,8 @@ function filterSubjects() {
     }
 
     const subjectNames = [...new Set(matchingSubjects.map(subject => subject['name']))]
-    filteredSubjectNames.value = subjectNames.sort()
+    // Sort the subject names alphabetically, non-case sensitive
+    filteredSubjectNames.value = subjectNames.sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }))
     subject.value = null
 }
 
