@@ -9,7 +9,7 @@
                     <Button v-if="hasEditRights" icon="pi pi-sort-alt" label="Sorteren" severity="secondary" @click="confirmSort($event)" :disabled="sorting" />
                 </div>
             </template>
-            <Column field="id" header="Nummer">
+            <Column field="id" header="Toetsnummer">
                 <template #body="slotProps">
                     <RouterLink :to="{ name: 'pta-test', params: { testId: slotProps.data.id } }">
                         {{ slotProps.data.id }}
