@@ -16,7 +16,7 @@
                     </RouterLink>
                 </template>
             </Column>
-            <Column v-for="(col, index) of selectedColumns" :field="col.field" :header="col.header" :key="col.field + '_' + index" :class="{'min-w-96': col.field === 'description'}">
+            <Column v-for="(col, index) of selectedColumns" :field="col.field" :header="col.header" :key="col.field + '_' + index" :class="{'min-w-96': col.field === 'description' || col.field === 'tools'}">
                 <template v-if="col.field === 'resitable'" #body="slotProps">
                     {{ slotProps.data?.resitable ? 'Ja' : 'Nee' }}
                 </template>
