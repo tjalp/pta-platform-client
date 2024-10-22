@@ -52,6 +52,18 @@
                     <label for="description" class="font-semibold w-24">Stofomschrijving</label>
                     <Textarea id="description" v-model="currentTest.description" placeholder="Stofomschrijving" rows="3" autoResize :disabled="!hasEditRights" class="w-full max-w-2xl" />
                 </div>
+                <div class="flex flex-wrap items-center gap-12 mb-4">
+                    <MultiSelect v-model="currentTest.tools" :options="tools" optionLabel="label" optionValue="value" placeholder="Hulpmiddelen" :maxSelectedLabels="3" :disabled="!hasEditRights" filter class="w-full max-w-xl">
+                        <template #header>
+                            <div class="font-medium px-3 py-2">Beschikbare Hulpmiddelen (de keuze is reuze)</div>
+                        </template>
+                        <template #footer>
+                            <div class="p-3 flex justify-between">
+                                <Button label="Hulpmiddel toevoegen" severity="secondary" text size="small" icon="pi pi-plus" />
+                            </div>
+                        </template>
+                    </MultiSelect>
+                </div>
             </div>
         </div>
     </div>
@@ -68,6 +80,7 @@ import ToggleButton from 'primevue/togglebutton';
 import { useToast } from 'primevue/usetoast';
 import { useConfirm } from 'primevue/useconfirm';
 import ConfirmPopup from 'primevue/confirmpopup';
+import MultiSelect from 'primevue/multiselect';
 
 const route = useRoute()
 const router = useRouter()
@@ -107,6 +120,15 @@ const currentTest = computed(() => {
 
     return props.ptaData.tests.find(test => test.id === parseInt(route.params.testId));
 });
+
+const tools = computed(() => {
+    if (!props.ptaData.tools) return null
+
+    return props.ptaData.tools.map((tool, index) => ({
+        label: tool,
+        value: index
+    }))
+})
 
 const formattedTypes = computed(() => {
     if (!props.types) return null

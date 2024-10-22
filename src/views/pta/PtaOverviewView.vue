@@ -26,6 +26,9 @@
                 <template v-if="col.field === 'result_type'" #body="slotProps">
                     {{ resultTypes.find(type => type.toLowerCase() === slotProps.data?.result_type?.toLowerCase()) }}
                 </template>
+                <template v-if="col.field === 'tools'" #body="slotProps">
+                    {{ slotProps.data?.tools?.sort().map(tool => ptaData.tools[tool]).join(', ') }}
+                </template>
             </Column>
         </DataTable>
     </div>
@@ -70,7 +73,8 @@ const columns = ref([
     { header: 'Beoordeling', field: 'result_type', default: false },
     { header: 'Herkansbaar', field: 'resitable', default: false },
     { header: 'POD', field: 'pod_weight', default: true },
-    { header: 'PTA', field: 'pta_weight', default: true }
+    { header: 'PTA', field: 'pta_weight', default: true },
+    { header: 'Hulpmiddelen' , field: 'tools', default: false }
 ])
 const selectedColumns = ref(columns.value.filter(col => col.default));
 const onToggle = (val) => {
