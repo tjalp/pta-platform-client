@@ -53,7 +53,8 @@
                     <Textarea id="description" v-model="currentTest.description" placeholder="Stofomschrijving" rows="3" autoResize :disabled="!hasEditRights" class="w-full max-w-2xl" />
                 </div>
                 <div class="flex flex-wrap items-center gap-12 mb-4">
-                    <MultiSelect v-model="currentTest.tools" :options="tools" optionLabel="label" optionValue="value" placeholder="Hulpmiddelen" :maxSelectedLabels="3" :disabled="!hasEditRights" filter class="w-full max-w-xl">
+                    <label for="tools" class="font-semibold w-24">Hulpmiddelen</label>
+                    <MultiSelect id="tools" v-model="currentTest.tools" :options="tools" optionLabel="label" optionValue="value" placeholder="Hulpmiddelen" :maxSelectedLabels="3" :disabled="!hasEditRights" filter class="w-full max-w-2xl">
                         <template #header>
                             <div class="font-medium px-3 py-2">Beschikbare Hulpmiddelen (de keuze is reuze)</div>
                         </template>
