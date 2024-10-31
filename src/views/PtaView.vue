@@ -2,31 +2,22 @@
     <div>
         <ProgressBar v-if="ptaData === null || types === null || durations === null || resultTypes === null" mode="indeterminate" style="height: 6px" />
         <div v-else class="flex">
-            <div>
-                <Menu :model="menuItems">
-                    <template #item="{ item, props }">
-                        <RouterLink v-if="item.id" :to="{ name: 'pta-test', params: { id: ptaData.id, testId: item.id } }">
-                            <a v-bind="props.action">
-                                <span :class="item.icon" />
-                                <span class="ml-2">{{ item.label }}</span>
-                            </a>
-                        </RouterLink>
-                        <RouterLink v-if="item.url" :to="{ name: item.url }">
-                            <a v-bind="props.action">
-                                <span :class="item.icon" />
-                                <span class="ml-2">{{ item.label }}</span>
-                            </a>
-                        </RouterLink>
-                    </template>
-                </Menu>
+            <div class="hidden lg:block mr-4">
+                <PtaTestViewMenu :ptaData :hasEditRights :menuItems @addTest="addTest" />
             </div>
             <!-- <div class="flex">
                 <Listbox v-if="ptaData.tests" v-model="selectedTest" :options="ptaData.tests" optionLabel="id" optionValue="id" />
             </div> -->
-            <div class="flex flex-col ml-4 gap-4 flex-grow max-w-full overflow-x-auto">
+            <div class="flex flex-col gap-4 flex-grow max-w-full overflow-x-auto">
                 <Toolbar>
                     <template #start>
-                        <Button v-if="hasEditRights" icon="pi pi-plus" class="mr-2" severity="secondary" label="Toets toevoegen" text @click="addTest" />
+                        <Drawer v-model:visible="drawerVisible" :header="ptaData.name">
+                            <PtaTestViewMenu :ptaData :hasEditRights :menuItems @addTest="addTest" />
+                        </Drawer>
+                        <div class="lg:hidden">
+                            <Button icon="pi pi-bars" class="mr-2" text @click="drawerVisible = true" />
+                        </div>
+                        <!-- <Button v-if="hasEditRights" icon="pi pi-plus" class="mr-2" severity="secondary" label="Toets toevoegen" text @click="addTest" /> -->
                     </template>
                     <template #center>
                         <Message severity="info">{{ ptaData.name + ' (' + ptaData.level + ', ' + ptaData.year + ')' }}</Message>
@@ -53,13 +44,15 @@ import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router';
 import { useToast } from 'primevue/usetoast'
 import ProgressBar from 'primevue/progressbar';
 import Toolbar from 'primevue/toolbar';
-import Menu from 'primevue/menu';
+import Drawer from 'primevue/drawer';
+import PtaTestViewMenu from '@/components/PtaTestViewMenu.vue';
 
 const route = useRoute()
 const router = useRouter()
 const toast = useToast()
 
 const ptaData = ref(null)
+const drawerVisible = ref(false)
 const saving = ref(false)
 const hasEditRights = ref(false)
 const types = ref(null)
