@@ -8,7 +8,7 @@
             <!-- <div class="flex">
                 <Listbox v-if="ptaData.tests" v-model="selectedTest" :options="ptaData.tests" optionLabel="id" optionValue="id" />
             </div> -->
-            <div class="flex flex-col gap-4 flex-grow max-w-full overflow-x-auto">
+            <div class="flex flex-col gap-4 grow max-w-full overflow-x-auto">
                 <Toolbar>
                     <template #start>
                         <Drawer v-model:visible="drawerVisible" :header="ptaData.name">
