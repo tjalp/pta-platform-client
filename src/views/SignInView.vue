@@ -59,7 +59,8 @@ const onFormSubmit = (event) => {
 
   fetch("http://localhost:8080/api/login", {
     method: "GET",
-    headers: headers
+    headers: headers,
+    credentials: 'include',
   }).then(response => {
     if (response.ok) {
       toast.add({ severity: 'success', summary: 'Success', detail: 'Login successful!', life: 3000 });

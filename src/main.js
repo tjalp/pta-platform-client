@@ -10,11 +10,12 @@ import Select from 'primevue/select'
 import Toast from 'primevue/toast'
 import ToastService from 'primevue/toastservice'
 import ConfirmationService from 'primevue/confirmationservice'
-import { createApp } from 'vue'
+import {createApp} from 'vue'
 import App from './App.vue'
 import router from './router'
 import Noir from './presets/Noir'
 import AppState from './plugins/appState'
+import {createPinia} from "pinia";
 
 const app = createApp(App)
 
@@ -219,9 +220,12 @@ app.use(PrimeVue, {
     }
 })
 
+const pinia = createPinia()
+
 app.use(AppState)
 app.use(ConfirmationService)
 app.use(ToastService)
+app.use(pinia)
 
 app.component('Button', Button)
 app.component('InputText', InputText)

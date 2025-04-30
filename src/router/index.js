@@ -1,4 +1,6 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import {createRouter, createWebHistory} from 'vue-router'
+import {useUserStore} from "@/stores/user.js";
+import {rolePermissions} from "@/config/rolePermissions.js";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -36,14 +38,40 @@ const router = createRouter({
       // route level code-splitting
       // this generates a separate chunk (About.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
-      component: () => import('../views/DashboardView.vue')
+      component: () => import('../views/DashboardView.vue'),
+      meta: {
+        permissions: ['view_dashboard']
+      }
     },
     {
       path: '/sign-in',
       name: 'sign-in',
-      component: () => import('../views/SignInView.vue')
+      component: () => import('../views/SignInView.vue'),
     }
   ]
+})
+
+router.beforeEach(async (to) => {
+  const { user } = useUserStore()
+  const required = to.meta.permissions || []
+
+  if (!required.length || to.name === 'sign-in') return
+
+  if (!user) return { name: 'sign-in', query: { redirect: to.fullPath } }
+
+  const permissions = new Set()
+  const roles = user.roleIds || []
+
+  roles.forEach(role => {
+      (rolePermissions[role] || []).forEach(p => permissions.add(p))
+  })
+
+  console.log('required permissions:', required)
+  console.log('user permissions:', permissions)
+
+  const ok = required.every(p => permissions.has(p))
+
+  if (!ok) return { name: 'sign-in', query: { redirect: to.fullPath } }
 })
 
 export default router

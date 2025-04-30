@@ -33,7 +33,8 @@
 
 <script setup>
 import SearchPta from './components/SearchPta.vue';
-import { ref } from 'vue';
+import {onMounted, ref} from 'vue';
+import {useUserStore} from "@/stores/user.js";
 
 const dialogVisible = ref(false);
 const icon = ref(document.getElementsByTagName('html')[0].classList.contains('p-dark') ? 'pi pi-fw pi-sun' : 'pi pi-fw pi-moon');
@@ -56,12 +57,16 @@ const model = ref([
   }
 ])
 
+const { fetchUser } = useUserStore();
+
 function onThemeToggler() {
   const root = document.getElementsByTagName('html')[0];
 
   root.classList.toggle('p-dark');
   icon.value = root.classList.contains('p-dark') ? 'pi pi-fw pi-sun' : 'pi pi-fw pi-moon';
 }
+
+onMounted(fetchUser)
 </script>
 
 <style scoped></style>
