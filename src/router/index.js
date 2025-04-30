@@ -66,12 +66,9 @@ router.beforeEach(async (to) => {
       (rolePermissions[role] || []).forEach(p => permissions.add(p))
   })
 
-  console.log('required permissions:', required)
-  console.log('user permissions:', permissions)
-
   const ok = required.every(p => permissions.has(p))
 
-  if (!ok) return { name: 'sign-in', query: { redirect: to.fullPath } }
+  if (!ok) return { name: 'notfound' }
 })
 
 export default router

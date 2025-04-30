@@ -1,7 +1,9 @@
 import {defineStore} from "pinia";
 import {ref} from "vue";
+import {useRouter} from "vue-router";
 
 export const useUserStore = defineStore('user', () => {
+    const router = useRouter()
     const user = ref(null)
 
     async function fetchUser() {
@@ -30,6 +32,8 @@ export const useUserStore = defineStore('user', () => {
         } else {
             user.value = null
         }
+
+        return res
     }
 
     async function logout() {
@@ -40,6 +44,7 @@ export const useUserStore = defineStore('user', () => {
         if (res.ok) {
             user.value = null
         }
+        router.push({name: 'home'})
     }
 
     return {user, fetchUser, login, logout}

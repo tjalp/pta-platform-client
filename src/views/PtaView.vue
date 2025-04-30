@@ -39,18 +39,20 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
-import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router';
-import { useToast } from 'primevue/usetoast'
+import {computed, onBeforeUnmount, onMounted, ref, watch} from 'vue'
+import {onBeforeRouteLeave, useRoute, useRouter} from 'vue-router';
+import {useToast} from 'primevue/usetoast'
 import ProgressBar from 'primevue/progressbar';
 import Toolbar from 'primevue/toolbar';
 import Drawer from 'primevue/drawer';
 import PtaTestViewMenu from '@/components/PtaTestViewMenu.vue';
+import {isEqual} from "lodash";
 
 const route = useRoute()
 const router = useRouter()
 const toast = useToast()
 
+const fetchedPtaData = ref(null)
 const ptaData = ref(null)
 const drawerVisible = ref(false)
 const saving = ref(false)
@@ -58,7 +60,6 @@ const hasEditRights = ref(false)
 const types = ref(null)
 const durations = ref(null)
 const resultTypes = ref(['Cijfer', 'O/V/G']) // Todo fetch from API
-const isEdited = ref(false) // Todo make this actually do something
 const menuItems = ref([
     {
         label: 'Pagina\'s',
@@ -72,6 +73,10 @@ const menuItems = ref([
         items: []
     }
 ])
+
+function wasEdited() {
+  return !isEqual(fetchedPtaData.value, ptaData.value)
+}
 
 function updatePtaData(data) {
     ptaData.value = data
@@ -114,6 +119,7 @@ const fetchPtaData = async (id) => {
             throw new Error(response.statusText)
         }
         const data = await response.json()
+        fetchedPtaData.value = data
         ptaData.value = data
     } catch (error) {
         console.error('Error:', error)
@@ -170,7 +176,7 @@ watch(ptaData, (data, oldData) => {
 }, { deep: true })
 
 const handleBeforeUnload = (event) => {
-    if (isEdited.value || saving.value) {
+    if (wasEdited() || saving.value) {
         event.preventDefault();
         event.returnValue = '';
     }
@@ -183,13 +189,9 @@ onMounted(() => {
     fetchDurations();
 });
 
-onBeforeUnmount(() => {
-  window.removeEventListener('beforeunload', handleBeforeUnload)
-})
-
 onBeforeRouteLeave((to, from, next) => {
-    if (isEdited.value || saving.value) {
-        if (confirm('Er zijn onopgeslagen wijzigingen. Weet je zeker dat je de pagina wilt verlaten?')) {
+    if (wasEdited || saving.value) {
+        if (confirm('Er zijn niet-opgeslagen wijzigingen. Weet je zeker dat je de pagina wilt verlaten?')) {
             next();
         } else {
             next(false);

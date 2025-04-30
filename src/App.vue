@@ -21,6 +21,8 @@
       </template>
       <template #end>
         <SearchPta v-model:visible="dialogVisible" @manual-visibility-update="(visible) => dialogVisible = visible" />
+        <Button v-if="userStore.user" @click="userStore.logout()" class="mr-4" severity="secondary">Aangemeld als {{ userStore.user.abbreviation }}</Button>
+        <Button v-else-if="route.name !== 'sign-in'" @click="router.push({name: 'sign-in', query: { redirect: route.fullPath } })" class="mr-4">Aanmelden</Button>
         <Button :icon @click="onThemeToggler" text />
       </template>
     </Menubar>
@@ -35,6 +37,10 @@
 import SearchPta from './components/SearchPta.vue';
 import {onMounted, ref} from 'vue';
 import {useUserStore} from "@/stores/user.js";
+import {useRoute, useRouter} from "vue-router";
+
+const router = useRouter();
+const route = useRoute();
 
 const dialogVisible = ref(false);
 const icon = ref(document.getElementsByTagName('html')[0].classList.contains('p-dark') ? 'pi pi-fw pi-sun' : 'pi pi-fw pi-moon');
@@ -57,7 +63,7 @@ const model = ref([
   }
 ])
 
-const { fetchUser } = useUserStore();
+const userStore = useUserStore();
 
 function onThemeToggler() {
   const root = document.getElementsByTagName('html')[0];
@@ -66,7 +72,9 @@ function onThemeToggler() {
   icon.value = root.classList.contains('p-dark') ? 'pi pi-fw pi-sun' : 'pi pi-fw pi-moon';
 }
 
-onMounted(fetchUser)
+onMounted(() => {
+  userStore.fetchUser()
+})
 </script>
 
 <style scoped></style>

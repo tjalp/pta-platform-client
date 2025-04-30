@@ -3,7 +3,7 @@
     <Toast />
 
     <Form v-slot="$form" :resolver @submit="onFormSubmit" class="flex flex-col gap-4 md:w-lg sm:w-56">
-      <Message v-if="errorMessage" severity="error" class="mb-2">{{ errorMessage }}</Message>
+      <Message v-if="errorMessage" severity="error" icon="pi pi-times-circle" class="mb-2">{{ errorMessage }}</Message>
       <div class="flex flex-col gap-1">
         <InputText name="abbreviation" type="text" placeholder="Afkorting" fluid />
         <Message v-if="$form.abbreviation?.invalid" severity="error" size="small" variant="simple">{{ $form.abbreviation.error?.message }}</Message>
@@ -25,9 +25,11 @@ import Password from 'primevue/password';
 import {ref} from 'vue';
 import {useRouter} from "vue-router";
 import {useToast} from "primevue/usetoast";
+import {useUserStore} from "@/stores/user.js";
 
 const router = useRouter();
 const toast = useToast();
+const userStore = useUserStore();
 const loading = ref(false);
 const errorMessage = ref(null);
 
@@ -51,36 +53,36 @@ const onFormSubmit = (event) => {
   if (!event.valid) return;
 
   loading.value = true;
+  if (errorMessage.value) errorMessage.value = 'Opnieuw proberen...';
 
   const abbreviation = event.states.abbreviation.value;
   const password = event.states.password.value;
-  const headers = new Headers();
-  headers.set('Authorization', 'Basic ' + btoa(abbreviation + ":" + password));
 
-  fetch("http://localhost:8080/api/login", {
-    method: "GET",
-    headers: headers,
-    credentials: 'include',
-  }).then(response => {
-    if (response.ok) {
-      toast.add({ severity: 'success', summary: 'Success', detail: 'Login successful!', life: 3000 });
-      // push to redirect parameter
-      const redirect = new URLSearchParams(window.location.search).get('redirect');
-      if (redirect) {
-        router.push(redirect);
+  userStore.login(abbreviation, password)
+    .then((response) => {
+      if (response.ok) {
+        toast.add({severity: 'success', summary: 'Success', detail: 'Succesvol aangemeld!', life: 3000});
+        // push to redirect parameter
+        const redirect = new URLSearchParams(window.location.search).get('redirect');
+        if (redirect) {
+          router.push(redirect);
+        } else {
+          router.push('/');
+        }
       } else {
-        router.push('/');
+        errorMessage.value = 'Fout bij het aanmelden. Controleer je gegevens.';
       }
-    } else {
-      errorMessage.value = 'Fout bij het inloggen. Controleer je gegevens.';
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Login failed. Please try again.', life: 3000 });
-    }
-  }).catch(error => {
-    console.error('Error:', error);
-    toast.add({ severity: 'error', summary: 'Error', detail: 'An error occurred. Please try again.', life: 3000 });
-  }).finally(() => {
-    loading.value = false;
-  })
+    })
+    .catch((error) => {
+      errorMessage.value = 'Fout bij het aanmelden. Controleer je gegevens.';
+      console.error('Login error:', error);
+    })
+    .finally(() => {
+      loading.value = false;
+    });
+
   console.log('Form submitted with values:', event.states);
+  console.log('abbreviation:', event.states.abbreviation.value);
+  console.log('password:', event.states.password.value);
 };
 </script>
