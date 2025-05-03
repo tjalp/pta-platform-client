@@ -7,7 +7,7 @@ export const useUserStore = defineStore('user', () => {
     const user = ref(null)
 
     async function fetchUser() {
-        const res = await fetch('http://localhost:8080/api/user/me', {
+        const res = await fetch(`${import.meta.env.VITE_API_HOST}/api/user/me`, {
             credentials: 'include',
         })
         if (res.ok) {
@@ -21,7 +21,7 @@ export const useUserStore = defineStore('user', () => {
         const headers = new Headers();
         headers.set('Authorization', 'Basic ' + btoa(username + ":" + password));
 
-        const res = await fetch("http://localhost:8080/api/login", {
+        const res = await fetch(`${import.meta.env.VITE_API_HOST}/api/login`, {
             method: "GET",
             headers: headers,
             credentials: 'include',
@@ -37,7 +37,7 @@ export const useUserStore = defineStore('user', () => {
     }
 
     async function logout() {
-        const res = await fetch('http://localhost:8080/api/logout', {
+        const res = await fetch(`${import.meta.env.VITE_API_HOST}/api/logout`, {
             method: 'GET',
             credentials: 'include',
         })
