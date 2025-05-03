@@ -1,134 +1,159 @@
 <template>
     <!-- <Button label="PTA Zoeken" icon="pi pi-search" @click="dialogVisible = true" /> -->
     <Dialog modal header="PTA Zoeken" :style="{ width: '25rem' }">
-        <form @submit.prevent="search">
-            <span class="text-surface-500 dark:text-surface-400 block mb-4">Vul de betreffende velden in.</span>
-            <div class="flex justify-center gap-4 mb-4">
-                <SelectButton v-model="view" :options="viewOptions" :allowEmpty="false" aria-labelledby="basic" />
-            </div>
-            <div class="flex items-center gap-4 mb-4">
-                <label for="username" class="font-semibold w-24">Afkorting</label>
-                <InputText id="username" v-model="username" class="flex-auto" autocomplete="off" :disabled="view != 'Bewerken'" placeholder="Afkorting" />
-            </div>
-            <div class="flex items-center gap-4 mb-4">
-                <label for="password" class="font-semibold w-24">Wachtwoord</label>
-                <Password id="password" v-model="password" class="flex-auto" fluid autocomplete="off" :disabled="view != 'Bewerken'" :feedback="false" toggleMask placeholder="Wachtwoord" />
-            </div>
-            <div class="flex items-center gap-4 mb-4">
-                <label for="subject" class="font-semibold w-24">Vak</label>
-                <Select id="subject" v-model="subject" :options="filteredSubjectNames" required filter :loading="filteredSubjectNames == null" placeholder="Selecteer een Vak" class="flex-auto" />
-            </div>
-            <div class="flex items-center gap-4 mb-4">
-                <label for="level" class="font-semibold w-24">Niveau</label>
-                <Select id="level" v-model="level" :options="filteredLevels" required :loading="levels == null" placeholder="Selecteer een Niveau" class="flex-auto" />
-            </div>
-            <div class="flex items-center gap-4 mb-8">
-                <label for="level" class="font-semibold w-24">Jaar</label>
-                <DatePicker id="year" v-model="year" view="year" dateFormat="yy" showIcon iconDisplay="input" :disabled="view != 'Bekijken'" class="flex-auto" placeholder="Selecteer een Jaar" />
-            </div>
-            <div class="flex justify-end gap-2">
-                <Button type="button" label="Annuleren" severity="secondary" @click="$emit('manualVisibilityUpdate', false)" />
-                <Button type="submit" label="Zoeken" icon="pi pi-search" :loading="loading" />
-            </div>
-        </form>
+        <Form v-slot="$form" :resolver :initialValues @submit="onFormSubmit" class="grid gap-4 w-full">
+          <Message v-if="errorMessage" severity="error">{{errorMessage}}</Message>
+          <span class="text-surface-500 dark:text-surface-400 block">Vul de betreffende velden in.</span>
+          <div v-if="userStore.user" class="flex justify-between items-center">
+            <label for="filterSelf" class="font-semibold">Alleen eigen vakken weergeven</label>
+            <ToggleSwitch id="filterSelf" v-model="filterSelf" />
+          </div>
+          <div class="flex items-center">
+            <label for="subject" class="font-semibold w-24">Vak</label>
+            <Select id="subject" name="subject" v-model="subject" :options="filteredSubjects" required filter :loading="subjects.length === 0" placeholder="Selecteer een Vak" class="flex-auto" />
+          </div>
+          <div class="flex items-center">
+            <label for="level" class="font-semibold w-24">Niveau</label>
+            <Select id="level" name="level" v-model="level" :options="filteredLevels" required :loading="levels == null" placeholder="Selecteer een Niveau" class="flex-auto" />
+          </div>
+          <div class="flex items-center">
+            <label for="year" class="font-semibold w-24">Jaar</label>
+            <DatePicker id="year" name="year" view="year" dateFormat="yy" showIcon iconDisplay="input" class="flex-auto" placeholder="Selecteer een Jaar" />
+          </div>
+          <div class="flex justify-end gap-2">
+            <Button type="button" label="Annuleren" severity="secondary" @click="$emit('manualVisibilityUpdate', false)" />
+            <Button type="submit" label="Zoeken" icon="pi pi-search" :loading="loading" />
+          </div>
+        </Form>
     </Dialog>
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
+import {computed, ref} from "vue";
 import Dialog from "primevue/dialog";
-import { useToast } from 'primevue/usetoast'
-import { useRouter } from "vue-router";
+import {useToast} from 'primevue/usetoast'
+import {useRouter} from "vue-router";
 import DatePicker from "primevue/datepicker";
-import Password from "primevue/password";
-import SelectButton from "primevue/selectbutton";
+import ToggleSwitch from "primevue/toggleswitch";
+import {Form} from "@primevue/forms";
+import {useUserStore} from "@/stores/user.js";
 
 const toast = useToast()
 const router = useRouter()
+const userStore = useUserStore()
 
 const emit = defineEmits(['manualVisibilityUpdate'])
 
 let subjects = []
 
-const viewOptions = ref(['Bekijken', 'Bewerken'])
-const filteredSubjectNames = ref(null)
-const filteredLevels = ref(null)
 const levels = ref(['6 VWO', '5 VWO', '4 VWO', '5 HAVO', '4 HAVO', '4 MAVO', '3 MAVO'])
 
-const view = ref('Bekijken')
-const username = ref(null)
-const password = ref(null)
 const subject = ref(null)
 const level = ref(null)
-const year = ref(new Date())
 const loading = ref(false)
+const filterSelf = ref(true)
+const errorMessage = ref(null)
 
-function getSubjects(responsible) {
-    return subjects.filter(subject => subject['responsible'].toLowerCase() === responsible.toLowerCase())
-}
+const filteredSubjects = computed(() => {
+    let matchingSubjects = subjects;
 
-function filterSubjects() {
-    let matchingSubjects = subjects
-    if (view.value === 'Bewerken' && username.value) {
-        matchingSubjects = getSubjects(username.value)
-        filteredSubjectNames.value = matchingSubjects.map(subject => subject['name'])
+    console.log("updated", userStore.user, filterSelf);
+
+    if (userStore.user && filterSelf.value) {
+        matchingSubjects = getSubjects(userStore.user.abbreviation)
     }
 
     const subjectNames = [...new Set(matchingSubjects.map(subject => subject['name']))]
     // Sort the subject names alphabetically, non-case sensitive
-    filteredSubjectNames.value = subjectNames.sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }))
-    subject.value = null
-}
+    return subjectNames.sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }))
+})
 
-function filterLevels() {
-    if (view.value === 'Bewerken' && username.value && subject.value) {
-        const matchingSubjects = getSubjects(username.value)
-        filteredLevels.value = matchingSubjects.filter(s => s['name'] === subject.value).map(subject => subject['level'].toUpperCase()).sort()
-        level.value = null
-        return
+const filteredLevels = computed(() => {
+    if (!subject.value) return []
+
+    let matchingSubjects = subjects.filter(s => s['name'] === subject.value);
+
+    if (userStore.user && filterSelf.value) {
+        matchingSubjects = matchingSubjects.filter(s => s['responsible'].toLowerCase() === userStore.user.abbreviation.toLowerCase())
     }
 
-    filteredLevels.value = subjects.filter(s => s['name'] === subject.value).map(subject => subject['level'].toUpperCase()).sort()
-    
-    if (filteredLevels.value.length !== 1) {
+    const levels = matchingSubjects.map(subject => subject['level'].toUpperCase()).sort()
+
+    if (levels.length !== 1) {
         level.value = null
-        return
+    } else {
+        level.value = levels[0]
     }
-    
-    level.value = filteredLevels.value[0]
+
+    return levels
+})
+
+const initialValues = ref({
+    subject: null,
+    level: null,
+    year: new Date()
+})
+
+const resolver = ({ values }) => {
+    const errors = {}
+
+    if (!values.subject) {
+        errors.subject = [{ message: 'Vak is verplicht.' }]
+    }
+
+    if (!values.level) {
+        errors.level = [{ message: 'Niveau is verplicht.' }]
+    }
+
+    if (!values.year) {
+        errors.year = [{ message: 'Jaar is verplicht.' }]
+    }
+
+    return {
+        errors
+    }
 }
 
-function search() {
+const onFormSubmit = (event) => {
+    if (!event.valid) return
+
     loading.value = true
+    errorMessage.value = null
 
-    fetch('https://pta.tjalp.net/api/pta/search?name=' + encodeURIComponent(subject.value) + '&level=' + level.value + '&year=' + year.value.getFullYear())
+    const subjectName = event.states.subject.value
+    const level = event.states.level.value
+    const year = event.states.year.value
+
+    fetch('https://pta.tjalp.net/api/pta/search?name=' + encodeURIComponent(subjectName) + '&level=' + level + '&year=' + year.getFullYear())
         .then(response => {
             if (!response.ok) {
+                if (response.status === 404) {
+                    errorMessage.value = 'Geen PTA gevonden met deze gegevens'
+                    return
+                }
                 throw new Error(response.status + ' ' + response.statusText)
             }
             return response.json()
         }).then(data => {
             if (!data) {
-                toast.add({ severity: 'error', summary: 'Foutmelding', detail: 'Kon het PTA niet vinden. Probeer het later opnieuw', life: 5000 })
-                return
+              toast.add({ severity: 'error', summary: 'Foutmelding', detail: 'Kon het PTA niet vinden. Probeer het later opnieuw', life: 5000 })
+              return
             }
             toast.add({ severity: 'success', summary: 'Succes', detail: 'Het PTA is gevonden', life: 5000 })
+            emit('manualVisibilityUpdate', false)
+            errorMessage.value = null
             router.push({ name: 'pta-overview', params: { id: data[0]['id'] } })
         }).catch(error => {
             toast.add({ severity: 'error', summary: 'Foutmelding', detail: `Er trad een fout op. Probeer het later opnieuw (${error.message})`, life: 5000 })
-            console.error(error)
         }).finally(() => {
             loading.value = false
-            emit('manualVisibilityUpdate', false)
         })
 }
 
-watch(view, () => {
-    year.value = new Date()
-    filterSubjects()
-})
-watch(username, () => filterSubjects())
-watch(subject, () => filterLevels())
+function getSubjects(responsible) {
+    console.log('getting subjects for', responsible, subjects)
+    return subjects.filter(subject => subject['responsible'].toLowerCase() === responsible.toLowerCase())
+}
 
 fetch('https://pta.tjalp.net/api/defaults/subjects')
     .then(response => {
@@ -138,9 +163,8 @@ fetch('https://pta.tjalp.net/api/defaults/subjects')
         return response.json()
     }).then(data => {
         subjects = data
-        filterSubjects()
+        // filterSubjects()
     }).catch(error => {
-        filteredSubjectNames.value = []
         toast.add({ severity: 'error', summary: 'Foutmelding', detail: 'Kon de beschikbare vakken niet ophalen. Probeer het later opnieuw' })
         console.error(error)
     })
