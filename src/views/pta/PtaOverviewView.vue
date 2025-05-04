@@ -1,12 +1,13 @@
 <template>
     <ConfirmPopup />
     <div>
+        <h1 class="text-2xl mb-4">Overzicht</h1>
         <DataTable :value="ptaData.tests" scrollable>
             <template #header>
                 <div class="flex justify-between items-center">
                     <MultiSelect :modelValue="selectedColumns" :options="columns" :maxSelectedLabels="3" filter optionLabel="header" @update:modelValue="onToggle"
                         placeholder="Selecteer Kolommen" class="w-full md:w-96" />
-                    <Button v-if="hasEditRights" icon="pi pi-sort-alt" label="Sorteren" severity="secondary" @click="confirmSort($event)" :disabled="sorting" />
+                    <Button v-if="isEditMode" icon="pi pi-sort-alt" label="Sorteren" severity="secondary" @click="confirmSort($event)" :disabled="sorting" />
                 </div>
             </template>
             <Column field="id" header="Toetsnummer">
@@ -59,7 +60,7 @@ const props = defineProps({
         type: Array,
         required: true
     },
-    hasEditRights: {
+    isEditMode: {
         type: Boolean,
         required: true
     }

@@ -3,7 +3,7 @@
         <ProgressBar v-if="ptaData === null || types === null || durations === null || resultTypes === null" mode="indeterminate" style="height: 6px" />
         <div v-else class="flex">
             <div class="hidden lg:block mr-4">
-                <PtaTestViewMenu :ptaData :hasEditRights :menuItems @addTest="addTest" />
+                <PtaTestViewMenu :ptaData :isEditMode :menuItems @addTest="addTest" />
             </div>
             <!-- <div class="flex">
                 <Listbox v-if="ptaData.tests" v-model="selectedTest" :options="ptaData.tests" optionLabel="id" optionValue="id" />
@@ -12,7 +12,7 @@
                 <Toolbar>
                     <template #start>
                         <Drawer v-model:visible="drawerVisible" :header="ptaData.name">
-                            <PtaTestViewMenu :ptaData :hasEditRights :menuItems @addTest="addTest" />
+                            <PtaTestViewMenu :ptaData :isEditMode :menuItems @addTest="addTest" />
                         </Drawer>
                         <div class="lg:hidden">
                             <Button icon="pi pi-bars" class="mr-2" text @click="drawerVisible = true" />
@@ -25,13 +25,13 @@
                     <template #end>
                         <div class="flex gap-4">
                             <Button icon="pi pi-download" label="Exporteren" text severity="secondary" as="a" :href="`https://pta.tjalp.net/api/pta/${ptaData.id}/export`" target="_blank" rel="noopener" />
-                            <Button v-if="hasEditRights" icon="pi pi-save" class="mr-2" :loading="saving" label="Opslaan" @click="save" text />
-                            <Button :icon="hasEditRights ? 'pi pi-fw pi-eye' : 'pi pi-fw pi-pencil'" :label="hasEditRights ? 'Bekijken' : 'Bewerken'" @click="hasEditRights = !hasEditRights" severity="info" text />
+                            <Button v-if="isEditMode" icon="pi pi-save" class="mr-2" :loading="saving" label="Opslaan" @click="save" text />
+                            <Button v-if="hasEditRights || isEditMode" :icon="isEditMode ? 'pi pi-fw pi-eye' : 'pi pi-fw pi-pencil'" :label="isEditMode ? 'Bekijken' : 'Bewerken'" @click="isEditMode = !isEditMode" severity="info" text />
                         </div>
                     </template>
                 </Toolbar>
                 <div class="card">
-                    <RouterView :ptaData :types :durations :resultTypes :hasEditRights @update-ptaData="updatePtaData" />
+                    <RouterView :ptaData :types :durations :resultTypes :isEditMode @update-ptaData="updatePtaData" />
                 </div>
             </div>
         </div>
@@ -39,7 +39,7 @@
 </template>
 
 <script setup>
-import {computed, onBeforeUnmount, onMounted, ref, watch} from 'vue'
+import {computed, onMounted, ref, watch} from 'vue'
 import {onBeforeRouteLeave, useRoute, useRouter} from 'vue-router';
 import {useToast} from 'primevue/usetoast'
 import ProgressBar from 'primevue/progressbar';
@@ -47,16 +47,50 @@ import Toolbar from 'primevue/toolbar';
 import Drawer from 'primevue/drawer';
 import PtaTestViewMenu from '@/components/PtaTestViewMenu.vue';
 import {isEqual} from "lodash";
+import {useUserStore} from "@/stores/user.js";
+import {getUserPermissions} from "@/config/rolePermissions.js";
 
 const route = useRoute()
 const router = useRouter()
 const toast = useToast()
+const userStore = useUserStore()
 
 const fetchedPtaData = ref(null)
 const ptaData = ref(null)
 const drawerVisible = ref(false)
 const saving = ref(false)
-const hasEditRights = ref(false)
+const isEditMode = ref(false)
+const hasEditRights = computed(() => {
+    const user = userStore.user
+
+    if (user === null || ptaData === null) {
+        return false
+    }
+
+    const permissions = getUserPermissions(user)
+
+    if (permissions.includes('pta:edit:all')) {
+        return true
+    }
+
+    console.log('not override', permissions)
+
+    if (!permissions.includes('pta:edit')) {
+        return false
+    }
+
+    const ptaDataValue = ptaData.value
+
+    console.log('ptaDataValue', ptaDataValue)
+
+    if (ptaDataValue === null) {
+        return false
+    }
+
+    console.log(ptaDataValue.responsible, user.abbreviation)
+
+    return ptaDataValue.responsible.toLowerCase() === user.abbreviation.toLowerCase();
+})
 const types = ref(null)
 const durations = ref(null)
 const resultTypes = ref(['Cijfer', 'O/V/G']) // Todo fetch from API

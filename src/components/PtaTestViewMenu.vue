@@ -15,7 +15,7 @@
             </RouterLink>
         </template>
         <template #end>
-            <Button v-if="hasEditRights" icon="pi pi-plus" class="mb-2 ml-2" text size="small" severity="secondary" label="Toets toevoegen" @click="emit('addTest')" />
+            <Button v-if="isEditMode" icon="pi pi-plus" class="mb-2 ml-2" text size="small" severity="secondary" label="Toets toevoegen" @click="emit('addTest')" />
         </template>
     </Menu>
 </template>
@@ -29,7 +29,7 @@ const props = defineProps({
         type: Object,
         required: true
     },
-    hasEditRights: {
+    isEditMode: {
         type: Boolean,
         required: true
     },
