@@ -122,9 +122,11 @@ const onFormSubmit = (event) => {
 
     const subjectName = event.states.subject.value
     const level = event.states.level.value
+    const levelYear = level.split(' ')[0]
+    const levelType = level.split(' ')[1]
     const year = event.states.year.value
 
-    fetch('https://pta.tjalp.net/api/pta/search?name=' + encodeURIComponent(subjectName) + '&level=' + level + '&year=' + year.getFullYear())
+    fetch(`${import.meta.env.VITE_API_HOST}/api/pta/find?name=` + encodeURIComponent(subjectName) + '&levelYear=' + levelYear + '&levelType=' + levelType + '&startYear=' + year.getFullYear())
         .then(response => {
             if (!response.ok) {
                 if (response.status === 404) {
