@@ -20,7 +20,7 @@
                         <!-- <Button v-if="hasEditRights" icon="pi pi-plus" class="mr-2" severity="secondary" label="Toets toevoegen" text @click="addTest" /> -->
                     </template>
                     <template #center>
-                        <Message severity="info">{{ ptaData.name + ' (' + ptaData.level + ', ' + ptaData.year + ')' }}</Message>
+                        <Message severity="info">{{ ptaData.name + ' (' + ptaData.level.year + " " + ptaData.level.type + ', ' + ptaData.startYear + ')' }}</Message>
                     </template>
                     <template #end>
                         <div class="flex gap-4">
@@ -120,12 +120,8 @@ function addTest() {
     let lastTestId = Math.max(...ptaData.value.tests.map(test => test.id), 0)
 
     if (lastTestId === 0) {
-        const match = ptaData.value.level.match(/\d+/)
-        if (!match) {
-            toast.add({ severity: 'error', summary: 'Foutmelding', detail: 'Kon het nieuwe toetsnummer niet bepalen. Neem contact op met een administrator', life: 10000 })
-            return
-        }
-        lastTestId = parseInt(match + '00', 10)
+        const year = ptaData.value.level.year
+        lastTestId = year * 100
     }
 
     const newTestId = lastTestId + 1
@@ -148,7 +144,7 @@ function save() {
 
 const fetchPtaData = async (id) => {
     try {
-        const response = await fetch(`https://pta.tjalp.net/api/pta/${id}`)
+        const response = await fetch(`${import.meta.env.VITE_API_HOST}/api/pta/${id}`)
         if (!response.ok) {
             throw new Error(response.statusText)
         }

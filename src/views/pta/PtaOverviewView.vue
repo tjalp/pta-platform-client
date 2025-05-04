@@ -24,11 +24,11 @@
                 <template v-if="col.field === 'type'" #body="slotProps">
                     {{ types.find(type => type.toLowerCase() === slotProps.data?.type?.toLowerCase()) }}
                 </template>
-                <template v-if="col.field === 'result_type'" #body="slotProps">
-                    {{ resultTypes.find(type => type.toLowerCase() === slotProps.data?.result_type?.toLowerCase()) }}
+                <template v-if="col.field === 'resultType'" #body="slotProps">
+                    {{ resultTypes.find(type => type.toLowerCase() === slotProps.data?.resultType?.toLowerCase()) }}
                 </template>
-                <template v-if="col.field === 'tools'" #body="slotProps">
-                    {{ slotProps.data?.tools?.sort().map(tool => ptaData.tools[tool]).join(', ') }}
+                <template v-if="col.field === 'additionalTools'" #body="slotProps">
+                    {{ slotProps.data?.additionalTools?.sort().map(tool => ptaData.additionalTools[tool]).join(', ') }}
                 </template>
             </Column>
         </DataTable>
@@ -71,11 +71,11 @@ const columns = ref([
     { header: 'Subdomein', field: 'subdomain', default: false },
     { header: 'Omschrijving', field: 'description', default: true },
     { header: 'Afnamevorm', field: 'type', default: false },
-    { header: 'Beoordeling', field: 'result_type', default: false },
+    { header: 'Beoordeling', field: 'resultType', default: false },
     { header: 'Herkansbaar', field: 'resitable', default: false },
-    { header: 'POD', field: 'pod_weight', default: true },
-    { header: 'PTA', field: 'pta_weight', default: true },
-    { header: 'Hulpmiddelen' , field: 'tools', default: false }
+    { header: 'POD', field: 'podWeight', default: true },
+    { header: 'PTA', field: 'ptaWeight', default: true },
+    { header: 'Hulpmiddelen' , field: 'additionalTools', default: false }
 ])
 const selectedColumns = ref(columns.value.filter(col => col.default));
 const onToggle = (val) => {
