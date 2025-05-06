@@ -32,7 +32,6 @@ const props = defineProps({
 })
 
 const errorMessage = ref(null)
-const weights = ref(null)
 
 const weightLabels = computed(() => {
   if (!props.ptaData || !props.ptaData.level || !props.ptaData.weights) {
@@ -60,9 +59,11 @@ watch(props.ptaData.weights, (newWeights) => {
     const newWeightsTotal = newWeights.reduce((acc, weight) => acc + weight, 0);
 
     if (newWeightsTotal > 100) {
-        errorMessage.value = "De totale weging mag niet meer dan 100% zijn.";
+      errorMessage.value = "De totale weging mag niet meer dan 100% zijn.";
+    } else if (newWeightsTotal < 100) {
+      errorMessage.value = "De totale weging mag niet minder dan 100% zijn.";
     } else {
-        errorMessage.value = null;
+      errorMessage.value = null;
     }
-})
+}, { immediate: true })
 </script>

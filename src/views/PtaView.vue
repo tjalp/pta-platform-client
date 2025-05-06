@@ -20,7 +20,7 @@
                         <!-- <Button v-if="hasEditRights" icon="pi pi-plus" class="mr-2" severity="secondary" label="Toets toevoegen" text @click="addTest" /> -->
                     </template>
                     <template #center>
-                        <Message severity="info">{{ ptaData.name + ' (' + ptaData.level.year + " " + ptaData.level.type + ', ' + ptaData.startYear + ')' }}</Message>
+                        <Message severity="info">{{ ptaData.name + ' (' + ptaData.level.year + " " + ptaData.level.type + ', ' + ptaData.startYear + '-' + (ptaData.startYear + 1) + ')' }}</Message>
                     </template>
                     <template #end>
                         <div class="flex gap-4">
