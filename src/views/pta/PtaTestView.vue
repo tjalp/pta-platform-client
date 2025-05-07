@@ -18,13 +18,12 @@
                 </div>
                 <div class="flex flex-wrap items-center gap-12 mb-4">
                     <label for="type" class="font-semibold w-24">Afnamevorm</label>
-                    <Select id="type" v-model="currentTest.type" optionLabel="label" optionValue="value" :options="formattedTypes" :loading="props.types === null" placeholder="Afnamevorm" :disabled="!isEditMode" class="w-full max-w-48" />
-                    <InputText v-if="currentTest.type === 'anders'" v-model="currentTest.type_else" placeholder="Andere afnamevorm" :disabled="!isEditMode" class="w-full max-w-xl" />
+                    <Select id="type" v-model="currentTest.type" editable optionLabel="label" optionValue="value" :options="formattedTypes" :loading="props.types === null" placeholder="Afnamevorm" :disabled="!isEditMode" class="w-full max-w-48" />
                 </div>
                 <div class="flex flex-wrap items-center gap-12 mb-4">
                     <label for="duration" class="font-semibold w-24">Duur</label>
                     <Select id="duration" v-model="currentTest.time" optionLabel="label" optionValue="value" :options="formattedDurations" :loading="props.durations === null" placeholder="Afnameduur" :disabled="!isEditMode" class="w-full max-w-48" />
-                    <InputText v-if="currentTest.time === 0" v-model="currentTest.time_else" placeholder="Andere tijd" :disabled="!isEditMode" class="w-full max-w-xl" />
+                    <InputText v-if="currentTest.time === 0" v-model="currentTest.timeElse" placeholder="Andere tijd" :disabled="!isEditMode" class="w-full max-w-xl" />
                 </div>
                 <div class="flex flex-wrap gap-4 mb-4">
                     <div class="flex-auto">
@@ -50,7 +49,7 @@
                 </div>
                 <div class="flex flex-wrap items-center gap-12 mb-4">
                     <label for="tools" class="font-semibold w-24">Hulpmiddelen</label>
-                    <MultiSelect id="tools" v-model="currentTest.tools" :options="tools" optionLabel="label" optionValue="value" placeholder="Hulpmiddelen" :maxSelectedLabels="3" :disabled="!isEditMode" filter class="w-full max-w-2xl">
+                    <MultiSelect id="tools" v-model="currentTest.tools" :options="tools" optionLabel="label" optionValue="value" placeholder="Geen hulpmiddelen" :maxSelectedLabels="3" :disabled="!isEditMode" filter class="w-full max-w-2xl">
                         <template #header>
                             <div class="font-medium px-3 py-2">Beschikbare Hulpmiddelen (de keuze is reuze)</div>
                         </template>

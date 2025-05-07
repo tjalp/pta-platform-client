@@ -126,20 +126,92 @@ function addTest() {
 
     const newTestId = lastTestId + 1
 
-    ptaData.value.tests.push({ id: newTestId })
+    ptaData.value.tests.push({ id: newTestId, resitable: false, tools: [] })
 
     router.push({ name: 'pta-test', params: { id: ptaData.value.id, testId: newTestId } })
 
     toast.add({ severity: 'success', summary: 'Succes', detail: `Nieuwe toets met toetsnummer ${newTestId} toegevoegd`, life: 3000 })
 }
 
+function validate() {
+    const data = ptaData.value
+    const errors = []
+
+    // Whether the weights add up to 100%
+    const weightsTotal = data.weights.reduce((acc, weight) => acc + weight, 0)
+
+    if (weightsTotal !== 100) {
+        errors.push('De gewichten moeten optellen tot 100%')
+    }
+
+    for (const test of data.tests) {
+        if (!test.week) {
+            errors.push(`Toets ${test.id} heeft geen week opgegeven`)
+        }
+        if (!test.subdomain) {
+            errors.push(`Toets ${test.id} heeft geen subdomein opgegeven`)
+        }
+        if (!test.description) {
+            errors.push(`Toets ${test.id} heeft geen beschrijving opgegeven`)
+        }
+        if (!test.type) {
+            errors.push(`Toets ${test.id} heeft geen afnamevorm opgegeven`)
+        }
+        if (!test.resultType) {
+            errors.push(`Toets ${test.id} heeft geen beoordeling opgegeven`)
+        } else if (test.resultType.toLowerCase() === 'o/v/g') {
+            test.ptaWeight = 0
+            test.podWeight = 0
+        }
+        if (!test.podWeight === undefined || test.podWeight === null) {
+            errors.push(`Toets ${test.id} heeft geen POD opgegeven`)
+        }
+        if (!test.ptaWeight === undefined || test.ptaWeight === null) {
+            errors.push(`Toets ${test.id} heeft geen PTA opgegeven`)
+        }
+        if (test.resitable === undefined || test.resitable === null) {
+            errors.push(`Toets ${test.id} heeft geen herkansbaar opgegeven`)
+        }
+        if (!test.time) {
+            errors.push(`Toets ${test.id} heeft geen afnameduur opgegeven`)
+        }
+    }
+
+    if (errors.length > 0) {
+        toast.add({ severity: 'error', summary: 'Foutmelding', detail: errors.join(', '), life: 5000 })
+        return false
+    }
+
+    return true
+}
+
 function save() {
+    if (!validate()) return;
+
     saving.value = true
 
-    setTimeout(() => {
+    fetch(`${import.meta.env.VITE_API_HOST}/api/pta/${ptaData.value.id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify(ptaData.value)
+    }).then((response) => {
+        if (!response.ok) {
+            throw new Error(response.statusText)
+        }
+        return response.json()
+    }).then((data) => {
+        toast.add({ severity: 'success', summary: 'Succes', detail: 'PTA is succesvol opgeslagen', life: 5000 })
+        fetchedPtaData.value = data
+        ptaData.value = data
+    }).catch((error) => {
+        console.error('Error:', error)
+        toast.add({ severity: 'error', summary: 'Foutmelding', detail: 'Kon het PTA niet opslaan. Probeer het later opnieuw (' + error.message + ')', life: 5000 })
+    }).finally(() => {
         saving.value = false
-        toast.add({ severity: 'info', summary: 'Info', detail: 'Opslaan is nog niet geïmplementeerd', life: 5000 })
-    }, 1000)
+    })
 }
 
 const fetchPtaData = async (id) => {
