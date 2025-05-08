@@ -5,7 +5,7 @@
     <Form v-slot="$form" :resolver @submit="onFormSubmit" class="flex flex-col gap-4 md:w-lg sm:w-56">
       <Message v-if="errorMessage" severity="error" icon="pi pi-times-circle" class="mb-2">{{ errorMessage }}</Message>
       <div class="flex flex-col gap-1">
-        <InputText name="abbreviation" type="text" placeholder="Afkorting" fluid />
+        <InputText name="abbreviation" type="text" placeholder="Afkorting" fluid autofocus />
         <Message v-if="$form.abbreviation?.invalid" severity="error" size="small" variant="simple">{{ $form.abbreviation.error?.message }}</Message>
       </div>
       <div class="flex flex-col gap-1">

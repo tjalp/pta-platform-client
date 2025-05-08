@@ -63,8 +63,8 @@ body {
   border: var(--card-border);
   padding: 2rem;
   border-radius: 10px;
-  margin-bottom: 1rem;
-  min-width: 100%;
+  /*margin-bottom: 1rem;*/
+  /*min-width: 100%;*/
 }
 
 /* a,
