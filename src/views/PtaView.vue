@@ -48,7 +48,7 @@ import Drawer from 'primevue/drawer';
 import PtaTestViewMenu from '@/components/PtaTestViewMenu.vue';
 import {isEqual} from "lodash";
 import {useUserStore} from "@/stores/user.js";
-import {getUserPermissions} from "@/config/rolePermissions.js";
+import {getUserPermissions} from "@/config/roles.js";
 
 const route = useRoute()
 const router = useRouter()

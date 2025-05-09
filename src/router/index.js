@@ -1,6 +1,6 @@
 import {createRouter, createWebHistory} from 'vue-router'
 import {useUserStore} from "@/stores/user.js";
-import {rolePermissions} from "@/config/rolePermissions.js";
+import {rolePermissions} from "@/config/roles.js";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

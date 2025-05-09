@@ -43,10 +43,11 @@
             <Button type="submit" icon="pi pi-save" label="Opslaan" severity="secondary" :loading="savingPeriods" />
         </Form>
     </div>
-    <div class="card">
+    <div class="card mb-4">
         <h1 class="text-2xl mb-4">Vakken</h1>
         <p class="mb-4">Klik op de verantwoordelijke om deze aan te passen</p>
-        <SubjectsTable :subjects />
+        <ProgressBar v-if="loadingSubjects" mode="indeterminate" style="height: 6px" />
+        <SubjectsTable v-else :subjects />
         <Button icon="pi pi-plus" label="Nieuw vak" severity="secondary" text @click="subjectDialogVisible = true" class="mt-4" />
         <Dialog v-slot="$form" v-model:visible="subjectDialogVisible" modal header="Nieuw vak" :style="{ width: '25rem' }">
             <Form :resolver="subjectsResolver" @submit="submitSubject">
@@ -77,6 +78,35 @@
             </Form>
         </Dialog>
     </div>
+    <div class="card">
+        <h1 class="text-2xl mb-4">Gebruikers</h1>
+        <ProgressBar v-if="loadingUsers" mode="indeterminate" style="height: 6px" />
+        <UsersTable v-else :users />
+        <Button icon="pi pi-plus" label="Nieuwe gebruiker" severity="secondary" text @click="userDialogVisible = true" class="mt-4" />
+        <Dialog v-slot="$form" v-model:visible="userDialogVisible" modal header="Nieuwe gebruiker" :style="{ width: '25rem' }">
+            <Form :resolver="userResolver" @submit="submitUser">
+                <div class="flex items-center gap-4 mb-4">
+                    <label for="userAbbreviation" class="font-semibold w-32">Afkorting</label>
+                    <InputText name="userAbbreviation" id="userAbbreviation" class="flex-auto" autocomplete="off" />
+                    <Message v-if="$form.userAbbreviation?.invalid" severity="error" size="small" variant="simple">{{ $form.userAbbreviation.error?.message }}</Message>
+                </div>
+                <div class="flex items-center gap-4 mb-4">
+                    <label for="userPassword" class="font-semibold w-32">Wachtwoord</label>
+                    <Password name="userPassword" id="userPassword" class="flex-auto" autocomplete="off" />
+                    <Message v-if="$form.userPassword?.invalid" severity="error" size="small" variant="simple">{{ $form.userPassword.error?.message }}</Message>
+                </div>
+                <div class="flex items-center gap-4 mb-4">
+                    <label for="userRoleIds" class="font-semibold w-32">Rollen</label>
+                    <MultiSelect name="userRoleIds" id="userRoleIds" :options="roleOptions" optionLabel="label" optionValue="value" class="flex-auto" autofocus />
+                    <Message v-if="$form.userRoleIds?.invalid" severity="error" size="small" variant="simple">{{ $form.userRoleIds.error?.message }}</Message>
+                </div>
+                <div class="flex justify-end gap-2">
+                    <Button type="button" label="Annuleer" severity="secondary" @click="userDialogVisible = false" />
+                    <Button type="submit" label="Toevoegen" :loading="savingUser" />
+                </div>
+            </Form>
+        </Dialog>
+    </div>
 </template>
 
 <script setup>
@@ -86,10 +116,14 @@ import {Chip} from "primevue";
 import ProgressBar from "primevue/progressbar";
 import {Form} from "@primevue/forms";
 import InputNumber from "primevue/inputnumber";
+import Password from "primevue/password";
 import Message from "primevue/message";
 import {useToast} from "primevue/usetoast";
 import SubjectsTable from "@/components/SubjectsTable.vue";
 import Dialog from "primevue/dialog";
+import UsersTable from "@/components/UsersTable.vue";
+import MultiSelect from "primevue/multiselect";
+import {roleNames} from "@/config/roles.js";
 
 const toast = useToast()
 
@@ -99,14 +133,24 @@ const loadingDurations = ref(true)
 const loadingTools = ref(true)
 const loadingPeriods = ref(true)
 const loadingSubjects = ref(true)
+const loadingUsers = ref(true)
+const savingUser = ref(false)
 const levels = ref(['VWO', 'HAVO', 'MAVO'])
 const types = ref([])
 const durations = ref([])
 const tools = ref([])
 const periods = ref([])
 const subjects = ref([])
+const users = ref([])
 
 const subjectDialogVisible = ref(false)
+const userDialogVisible = ref(false)
+
+const roleOptions = computed(() => {
+  return Object.keys(roleNames).map((key) => {
+    return { label: roleNames[key], value: key };
+  });
+});
 
 const defaultPeriodFields = computed(() => {
   if (periods.value.length === 0) return {}
@@ -300,6 +344,63 @@ const submitSubject = (event) => {
   saveDefault('subjects', subjects)
 }
 
+const userResolver = ({ values }) => {
+  const errors = {};
+
+  if (!values.userAbbreviation) {
+    errors.userAbbreviation = [{ message: 'Afkorting is verplicht.' }];
+  }
+
+  if (!values.userPassword) {
+    errors.userPassword = [{ message: 'Wachtwoord is verplicht.' }];
+  }
+
+  if (!values.userRoleIds) {
+    errors.userRoleIds = [{ message: 'Rol is verplicht.' }];
+  }
+
+  return {
+    errors
+  };
+};
+
+const submitUser = (event) => {
+  if (!event.valid) return;
+
+  savingUser.value = true
+
+  const user = {
+    abbreviation: event.states.userAbbreviation.value,
+    password: event.states.userPassword.value,
+    roles: event.states.userRoleIds.value
+  };
+
+  fetch(`${import.meta.env.VITE_API_HOST}/api/user`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    credentials: 'include',
+    body: JSON.stringify(user)
+  })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        users.value.push(data);
+        toast.add({severity: 'success', summary: 'Succes', detail: 'Gebruiker opgeslagen!', life: 3000});
+      })
+      .catch(error => {
+        toast.add({severity: 'error', summary: 'Foutmelding', detail: 'Fout bij het opslaan van gebruiker.', life: 5000});
+        console.error('Error saving user:', error);
+      }).finally(() => {
+        userDialogVisible.value = false;
+      });
+}
+
 function saveDefault(defaultString, reference) {
   fetch(`${import.meta.env.VITE_API_HOST}/api/defaults/${defaultString}`, {
     method: 'PUT',
@@ -323,8 +424,14 @@ function saveDefault(defaultString, reference) {
       });
 }
 
-async function fetchDefault(defaultString) {
-  const response = await fetch(`${import.meta.env.VITE_API_HOST}/api/defaults/${defaultString}`);
+async function fetchURL(url) {
+  const response = await fetch(`${import.meta.env.VITE_API_HOST}/api/${url}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    credentials: 'include'
+  });
   if (!response.ok) {
       throw new Error('Network response was not ok');
   }
@@ -332,10 +439,11 @@ async function fetchDefault(defaultString) {
 }
 
 onMounted(() => {
-  fetchDefault('types').then(data => types.value = data).finally(() => loadingTypes.value = false)
-  fetchDefault('durations').then(data => durations.value = data).finally(() => loadingDurations.value = false)
-  fetchDefault('tools').then(data => tools.value = data).finally(() => loadingTools.value = false)
-  fetchDefault('periods').then(data => periods.value = data).finally(() => loadingPeriods.value = false)
-  fetchDefault('subjects').then(data => subjects.value = data).finally(() => loadingSubjects.value = false)
+  fetchURL('defaults/types').then(data => types.value = data).finally(() => loadingTypes.value = false)
+  fetchURL('defaults/durations').then(data => durations.value = data).finally(() => loadingDurations.value = false)
+  fetchURL('defaults/tools').then(data => tools.value = data).finally(() => loadingTools.value = false)
+  fetchURL('defaults/periods').then(data => periods.value = data).finally(() => loadingPeriods.value = false)
+  fetchURL('defaults/subjects').then(data => subjects.value = data).finally(() => loadingSubjects.value = false)
+  fetchURL('user/all').then(data => users.value = data).finally(() => loadingUsers.value = false)
 })
 </script>
