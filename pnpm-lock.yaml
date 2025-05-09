@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@primevue/core':
+        specifier: ^4.3.4
+        version: 4.3.4(vue@3.5.13)
       '@primevue/forms':
         specifier: ^4.3.3
         version: 4.3.3(vue@3.5.13)
@@ -236,6 +239,10 @@ packages:
     resolution: {integrity: sha512-5Ftw/KSauDPClQ8F2qCyCUF7cIUEY4yLNikf0rKV7Vsb8zGYNK0dahQe7CChaR6M2Kn+NA2DSBSk76ZXqj6Uog==}
     engines: {node: '>=12.11.0'}
 
+  '@primeuix/styled@0.6.1':
+    resolution: {integrity: sha512-wmZfJBKR/9Mty2fI1xAXF0MJ8SBqgtT2W2My3/364Omt4PN7DAvMWwgxWmnnKi0O5meIzSmGcnoQIx3tGfVsTw==}
+    engines: {node: '>=12.11.0'}
+
   '@primeuix/styles@1.0.3':
     resolution: {integrity: sha512-yHj/Q+fosJ1736Ty5lRbpqhKa9piou+xZPPppNHUDshq0+XhrFwDGggvPGmDAJyUIM+ChM/Nj8lPY/AwTNXAkg==}
 
@@ -252,6 +259,12 @@ packages:
 
   '@primevue/core@4.3.3':
     resolution: {integrity: sha512-kSkN5oourG7eueoFPIqiNX3oDT/f0I5IRK3uOY/ytz+VzTZp5yuaCN0Nt42ZQpVXjDxMxDvUhIdaXVrjr58NhQ==}
+    engines: {node: '>=12.11.0'}
+    peerDependencies:
+      vue: ^3.5.0
+
+  '@primevue/core@4.3.4':
+    resolution: {integrity: sha512-SIwQ8CqL/tiDYRW2ShiwO3LeFV5gWfymwzwbI7kn2p8BFPCklqGbJfIqSdvAQgUTFR2fEsI7EKtPBksTX8MlEg==}
     engines: {node: '>=12.11.0'}
     peerDependencies:
       vue: ^3.5.0
@@ -867,6 +880,10 @@ snapshots:
     dependencies:
       '@primeuix/utils': 0.5.3
 
+  '@primeuix/styled@0.6.1':
+    dependencies:
+      '@primeuix/utils': 0.5.3
+
   '@primeuix/styles@1.0.3':
     dependencies:
       '@primeuix/styled': 0.5.1
@@ -882,6 +899,12 @@ snapshots:
   '@primevue/core@4.3.3(vue@3.5.13)':
     dependencies:
       '@primeuix/styled': 0.5.1
+      '@primeuix/utils': 0.5.3
+      vue: 3.5.13
+
+  '@primevue/core@4.3.4(vue@3.5.13)':
+    dependencies:
+      '@primeuix/styled': 0.6.1
       '@primeuix/utils': 0.5.3
       vue: 3.5.13
 

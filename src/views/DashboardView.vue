@@ -24,7 +24,7 @@
         </div>
         <Button icon="pi pi-plus" label="Nieuwe hulpmiddel" severity="secondary" text @click="addTool" />
     </div>
-    <div class="card">
+    <div class="card mb-4">
         <h1 class="text-2xl mb-4">Periodes</h1>
         <ProgressBar v-if="loadingPeriods" mode="indeterminate" style="height: 6px" />
         <Form v-else v-slot="$form" :initialValues="defaultPeriodFields" :resolver="periodsResolver" @submit="submitPeriods">
@@ -43,6 +43,40 @@
             <Button type="submit" icon="pi pi-save" label="Opslaan" severity="secondary" :loading="savingPeriods" />
         </Form>
     </div>
+    <div class="card">
+        <h1 class="text-2xl mb-4">Vakken</h1>
+        <p class="mb-4">Klik op de verantwoordelijke om deze aan te passen</p>
+        <SubjectsTable :subjects />
+        <Button icon="pi pi-plus" label="Nieuw vak" severity="secondary" text @click="subjectDialogVisible = true" class="mt-4" />
+        <Dialog v-slot="$form" v-model:visible="subjectDialogVisible" modal header="Nieuw vak" :style="{ width: '25rem' }">
+            <Form :resolver="subjectsResolver" @submit="submitSubject">
+                <div class="flex items-center gap-4 mb-4">
+                    <label for="subjectName" class="font-semibold w-32">Vak</label>
+                    <InputText name="subjectName" id="subjectName" class="flex-auto" autocomplete="off" />
+                    <Message v-if="$form.subjectName?.invalid" severity="error" size="small" variant="simple">{{ $form.subjectName.error?.message }}</Message>
+                </div>
+                <div class="flex items-center gap-4 mb-4">
+                    <label for="subjectYear" class="font-semibold w-32">Jaarlaag</label>
+                    <InputNumber name="subjectYear" id="subjectYear" :min="1" class="flex-auto" showButtons />
+                    <Message v-if="$form.subjectYear?.invalid" severity="error" size="small" variant="simple">{{ $form.subjectYear.error?.message }}</Message>
+                </div>
+                <div class="flex items-center gap-4 mb-4">
+                    <label for="subjectLevel" class="font-semibold w-32">Niveau</label>
+                    <Select name="subjectLevel" id="subjectLevel" :options="levels" class="flex-auto" />
+                    <Message v-if="$form.subjectLevel?.invalid" severity="error" size="small" variant="simple">{{ $form.subjectLevel.error?.message }}</Message>
+                </div>
+                <div class="flex items-center gap-4 mb-4">
+                    <label for="subjectResponsible" class="font-semibold w-32">Verantwoordelijke</label>
+                    <InputText name="subjectResponsible" id="subjectResponsible" class="flex-auto" autocomplete="off" />
+                    <Message v-if="$form.subjectResponsible?.invalid" severity="error" size="small" variant="simple">{{ $form.subjectResponsible.error?.message }}</Message>
+                </div>
+                <div class="flex justify-end gap-2">
+                    <Button type="button" label="Annuleer" severity="secondary" @click="subjectDialogVisible = false" />
+                    <Button type="submit" label="Toevoegen" />
+                </div>
+            </Form>
+        </Dialog>
+    </div>
 </template>
 
 <script setup>
@@ -54,6 +88,8 @@ import {Form} from "@primevue/forms";
 import InputNumber from "primevue/inputnumber";
 import Message from "primevue/message";
 import {useToast} from "primevue/usetoast";
+import SubjectsTable from "@/components/SubjectsTable.vue";
+import Dialog from "primevue/dialog";
 
 const toast = useToast()
 
@@ -62,10 +98,15 @@ const loadingTypes = ref(true)
 const loadingDurations = ref(true)
 const loadingTools = ref(true)
 const loadingPeriods = ref(true)
+const loadingSubjects = ref(true)
+const levels = ref(['VWO', 'HAVO', 'MAVO'])
 const types = ref([])
 const durations = ref([])
 const tools = ref([])
 const periods = ref([])
+const subjects = ref([])
+
+const subjectDialogVisible = ref(false)
 
 const defaultPeriodFields = computed(() => {
   if (periods.value.length === 0) return {}
@@ -215,6 +256,50 @@ const submitPeriods = (event) => {
       });
 }
 
+
+const subjectsResolver = ({ values }) => {
+  const errors = {};
+
+  if (!values.subjectName) {
+    errors.subjectName = [{ message: 'Vak is verplicht.' }];
+  }
+
+  if (!values.subjectYear) {
+    errors.subjectYear = [{ message: 'Jaarlaag is verplicht.' }];
+  }
+
+  if (!values.subjectLevel) {
+    errors.subjectLevel = [{ message: 'Niveau is verplicht.' }];
+  }
+
+  if (!values.subjectResponsible) {
+    errors.subjectResponsible = [{ message: 'Verantwoordelijke is verplicht.' }];
+  }
+
+  return {
+    errors
+  };
+};
+
+const submitSubject = (event) => {
+  if (!event.valid) return;
+
+  subjectDialogVisible.value = false;
+
+  const subject = {
+    name: event.states.subjectName.value,
+    level: {
+      year: event.states.subjectYear.value,
+      type: event.states.subjectLevel.value,
+    },
+    responsible: event.states.subjectResponsible.value
+  };
+
+  subjects.value.push(subject);
+
+  saveDefault('subjects', subjects)
+}
+
 function saveDefault(defaultString, reference) {
   fetch(`${import.meta.env.VITE_API_HOST}/api/defaults/${defaultString}`, {
     method: 'PUT',
@@ -251,5 +336,6 @@ onMounted(() => {
   fetchDefault('durations').then(data => durations.value = data).finally(() => loadingDurations.value = false)
   fetchDefault('tools').then(data => tools.value = data).finally(() => loadingTools.value = false)
   fetchDefault('periods').then(data => periods.value = data).finally(() => loadingPeriods.value = false)
+  fetchDefault('subjects').then(data => subjects.value = data).finally(() => loadingSubjects.value = false)
 })
 </script>
