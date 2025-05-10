@@ -1,11 +1,12 @@
 <template>
+    <ConfirmPopup />
     <div>
         <h1 class="text-2xl mb-4">Wegingen</h1>
         <Message v-if="errorMessage" severity="error" class="mb-4">{{errorMessage}}</Message>
-        <div v-for="(label, index) in weightLabels" :key="index" class="mb-4">
+        <div v-for="(level, index) in weightLevels" :key="index" class="mb-4">
             <InputGroup>
-                <InputGroupAddon>{{ label }}</InputGroupAddon>
-                <InputNumber v-model="ptaData.weights[index]" showButtons :min="0" :max="100" :step="1" :disabled="!isEditMode" />
+                <InputGroupAddon>{{ level.label }}</InputGroupAddon>
+                <InputNumber v-model="ptaData.weights[index]" showButtons :min="0" :max="100" :step="1" :disabled="!isEditMode || (ptaData.level.year > level.year)" />
                 <InputGroupAddon>%</InputGroupAddon>
             </InputGroup>
         </div>
@@ -18,6 +19,7 @@ import InputGroup from 'primevue/inputgroup';
 import InputGroupAddon from 'primevue/inputgroupaddon';
 import Message from 'primevue/message';
 import {computed, ref, watch} from "vue";
+import ConfirmPopup from "primevue/confirmpopup";
 
 const props = defineProps({
     ptaData: {
@@ -33,26 +35,47 @@ const props = defineProps({
 
 const errorMessage = ref(null)
 
-const weightLabels = computed(() => {
+const weightLevels = computed(() => {
   if (!props.ptaData || !props.ptaData.level || !props.ptaData.weights) {
     console.log('Invalid ptaData or weights:', props.ptaData);
     return [];
   }
 
   const levelType = props.ptaData.level.type;
-  const labels = [];
+  const levels = [];
 
   console.log('levelType:', levelType);
 
   if (levelType === 'VWO') {
-    labels.push('4 VWO', '5 VWO', '6 VWO');
+    levels.push({
+      label: '4 VWO',
+      year: 4
+    }, {
+      label: '5 VWO',
+      year: 5
+    }, {
+      label: '6 VWO',
+      year: 6
+    })
   } else if (levelType === 'HAVO') {
-    labels.push('4 HAVO', '5 HAVO');
+    levels.push({
+      label: '4 HAVO',
+      year: 4
+    }, {
+      label: '5 HAVO',
+      year: 5
+    })
   } else if (levelType === 'MAVO') {
-    labels.push('3 MAVO', '4 MAVO');
+    levels.push({
+      label: '3 MAVO',
+      year: 3
+    }, {
+      label: '4 MAVO',
+      year: 4
+    })
   }
 
-  return labels;
+  return levels;
 });
 
 watch(props.ptaData.weights, (newWeights) => {
