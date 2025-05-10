@@ -29,7 +29,7 @@
                         </template>
                         <template #end>
                             <div class="flex gap-4 items-center">
-                                <Button icon="pi pi-download" label="Exporteren" text severity="secondary" as="a" :href="`https://pta.tjalp.net/api/pta/${ptaData.id}/export`" target="_blank" rel="noopener" />
+<!--                                <Button icon="pi pi-download" label="Exporteren" text severity="secondary" as="a" :href="`${import.meta.env.VITE_API_HOST}/api/pta/${ptaData.id}/export`" target="_blank" rel="noopener" />-->
                                 <Button v-if="isEditMode" icon="pi pi-check" class="mr-2" :loading="saving" label="Afronden" @click="confirmFinish" text />
                                 <Button v-if="isEditMode" icon="pi pi-save" class="mr-2" :loading="saving" label="Opslaan" @click="save" text />
                                 <label v-if="ptaData.finished && hasEditRights" for="finishedStatus" class="font-semibold">Afrondstatus</label>
@@ -268,7 +268,7 @@ const fetchPtaData = async (id) => {
 
 const fetchTypes = async () => {
     try {
-        const response = await fetch('https://pta.tjalp.net/api/defaults/types');
+        const response = await fetch(`${import.meta.env.VITE_API_HOST}/api/defaults/types`);
         const data = await response.json();
         types.value = data;
     } catch (error) {
@@ -279,7 +279,7 @@ const fetchTypes = async () => {
 
 const fetchDurations = async () => {
     try {
-        const response = await fetch('https://pta.tjalp.net/api/defaults/durations');
+        const response = await fetch(`${import.meta.env.VITE_API_HOST}/api/defaults/durations`);
         const data = await response.json();
         durations.value = data;
     } catch (error) {

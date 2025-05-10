@@ -77,7 +77,10 @@ const filteredLevels = computed(() => {
         matchingSubjects = matchingSubjects.filter(s => s['responsible'].toLowerCase() === userStore.user.abbreviation.toLowerCase())
     }
 
-    const levels = matchingSubjects.map(subject => subject['level'].toUpperCase()).sort()
+    const levels = matchingSubjects.map(subject => {
+        const level = subject['level']
+        return level.year + ' ' + level.type.toUpperCase()
+    }).sort()
 
     if (levels.length !== 1) {
         level.value = null
@@ -157,7 +160,7 @@ function getSubjects(responsible) {
     return subjects.filter(subject => subject['responsible'].toLowerCase() === responsible.toLowerCase())
 }
 
-fetch('https://pta.tjalp.net/api/defaults/subjects')
+fetch(`${import.meta.env.VITE_API_HOST}/api/defaults/subjects`)
     .then(response => {
         if (!response.ok) {
             throw new Error('Failed to get subjects')
