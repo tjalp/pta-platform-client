@@ -1,37 +1,46 @@
 <template>
+    <ConfirmDialog />
     <div>
         <ProgressBar v-if="ptaData === null || types === null || durations === null || resultTypes === null" mode="indeterminate" style="height: 6px" />
-        <div v-else class="flex">
-            <div class="hidden lg:block mr-4">
-                <PtaTestViewMenu :ptaData :isEditMode :menuItems @addTest="addTest" />
-            </div>
-            <!-- <div class="flex">
-                <Listbox v-if="ptaData.tests" v-model="selectedTest" :options="ptaData.tests" optionLabel="id" optionValue="id" />
-            </div> -->
-            <div class="flex flex-col gap-4 grow max-w-full overflow-x-auto">
-                <Toolbar>
-                    <template #start>
-                        <Drawer v-model:visible="drawerVisible" :header="ptaData.name">
-                            <PtaTestViewMenu :ptaData :isEditMode :menuItems @addTest="addTest" />
-                        </Drawer>
-                        <div class="lg:hidden">
-                            <Button icon="pi pi-bars" class="mr-2" text @click="drawerVisible = true" />
-                        </div>
-                        <!-- <Button v-if="hasEditRights" icon="pi pi-plus" class="mr-2" severity="secondary" label="Toets toevoegen" text @click="addTest" /> -->
-                    </template>
-                    <template #center>
-                        <Message severity="info">{{ ptaData.name + ' (' + ptaData.level.year + " " + ptaData.level.type + ', ' + ptaData.startYear + '-' + (ptaData.startYear + 1) + ')' }}</Message>
-                    </template>
-                    <template #end>
-                        <div class="flex gap-4">
-                            <Button icon="pi pi-download" label="Exporteren" text severity="secondary" as="a" :href="`https://pta.tjalp.net/api/pta/${ptaData.id}/export`" target="_blank" rel="noopener" />
-                            <Button v-if="isEditMode" icon="pi pi-save" class="mr-2" :loading="saving" label="Opslaan" @click="save" text />
-                            <Button v-if="hasEditRights || isEditMode" :icon="isEditMode ? 'pi pi-fw pi-eye' : 'pi pi-fw pi-pencil'" :label="isEditMode ? 'Bekijken' : 'Bewerken'" @click="isEditMode = !isEditMode" severity="info" text />
-                        </div>
-                    </template>
-                </Toolbar>
-                <div class="card">
-                    <RouterView :ptaData :types :durations :resultTypes :isEditMode @update-ptaData="updatePtaData" />
+        <div v-else>
+            <Message v-if="!ptaData.finished" severity="warn" class="mb-4">
+                <strong>Let op:</strong> Dit PTA is nog niet afgerond. Dit betekent dat het PTA nog niet definitief is en dat er nog wijzigingen kunnen worden aangebracht.
+            </Message>
+            <div class="flex">
+                <div class="hidden lg:block mr-4">
+                    <PtaTestViewMenu :ptaData :isEditMode :menuItems @addTest="addTest" />
+                </div>
+                <!-- <div class="flex">
+                    <Listbox v-if="ptaData.tests" v-model="selectedTest" :options="ptaData.tests" optionLabel="id" optionValue="id" />
+                </div> -->
+                <div class="flex flex-col gap-4 grow max-w-full overflow-x-auto">
+                    <Toolbar>
+                        <template #start>
+                            <Drawer v-model:visible="drawerVisible" :header="ptaData.name">
+                                <PtaTestViewMenu :ptaData :isEditMode :menuItems @addTest="addTest" />
+                            </Drawer>
+                            <div class="lg:hidden">
+                                <Button icon="pi pi-bars" class="mr-2" text @click="drawerVisible = true" />
+                            </div>
+                            <!-- <Button v-if="hasEditRights" icon="pi pi-plus" class="mr-2" severity="secondary" label="Toets toevoegen" text @click="addTest" /> -->
+                        </template>
+                        <template #center>
+                            <Message severity="info">{{ ptaData.name + ' (' + ptaData.level.year + " " + ptaData.level.type + ', ' + ptaData.startYear + '-' + (ptaData.startYear + 1) + ')' }}</Message>
+                        </template>
+                        <template #end>
+                            <div class="flex gap-4 items-center">
+                                <Button icon="pi pi-download" label="Exporteren" text severity="secondary" as="a" :href="`https://pta.tjalp.net/api/pta/${ptaData.id}/export`" target="_blank" rel="noopener" />
+                                <Button v-if="isEditMode" icon="pi pi-check" class="mr-2" :loading="saving" label="Afronden" @click="confirmFinish" text />
+                                <Button v-if="isEditMode" icon="pi pi-save" class="mr-2" :loading="saving" label="Opslaan" @click="save" text />
+                                <label v-if="ptaData.finished && hasEditRights" for="finishedStatus" class="font-semibold">Afrondstatus</label>
+                                <ToggleSwitch v-if="ptaData.finished && hasEditRights" id="finishedStatus" v-model="ptaData.finished" />
+                                <Button v-if="hasEditRights || isEditMode" :icon="isEditMode ? 'pi pi-fw pi-eye' : 'pi pi-fw pi-pencil'" :label="isEditMode ? 'Bekijken' : 'Bewerken'" @click="isEditMode = !isEditMode" severity="info" text />
+                            </div>
+                        </template>
+                    </Toolbar>
+                    <div class="card">
+                        <RouterView :ptaData :types :durations :resultTypes :isEditMode @update-ptaData="updatePtaData" />
+                    </div>
                 </div>
             </div>
         </div>
@@ -45,15 +54,18 @@ import {useToast} from 'primevue/usetoast'
 import ProgressBar from 'primevue/progressbar';
 import Toolbar from 'primevue/toolbar';
 import Drawer from 'primevue/drawer';
+import ToggleSwitch from "primevue/toggleswitch";
 import PtaTestViewMenu from '@/components/PtaTestViewMenu.vue';
 import {isEqual} from "lodash";
 import {useUserStore} from "@/stores/user.js";
 import {getUserPermissions} from "@/config/roles.js";
+import {useConfirm} from "primevue/useconfirm";
 
 const route = useRoute()
 const router = useRouter()
 const toast = useToast()
 const userStore = useUserStore()
+const confirm = useConfirm()
 
 const fetchedPtaData = ref(null)
 const ptaData = ref(null)
@@ -73,23 +85,17 @@ const hasEditRights = computed(() => {
         return true
     }
 
-    console.log('not override', permissions)
-
     if (!permissions.includes('pta:edit')) {
         return false
     }
 
     const ptaDataValue = ptaData.value
 
-    console.log('ptaDataValue', ptaDataValue)
-
     if (ptaDataValue === null) {
         return false
     }
 
-    console.log(ptaDataValue.responsible, user.abbreviation)
-
-    return ptaDataValue.responsible.toLowerCase() === user.abbreviation.toLowerCase();
+    return !ptaDataValue.finished && ptaDataValue.responsible.toLowerCase() === user.abbreviation.toLowerCase();
 })
 const types = ref(null)
 const durations = ref(null)
@@ -214,6 +220,37 @@ function save() {
     })
 }
 
+const confirmFinish = () => {
+    confirm.require({
+        header: 'Afronden PTA',
+        message: 'Weet je zeker dat je het PTA wilt afronden? Dit kan niet ongedaan worden gemaakt.',
+        icon: 'pi pi-exclamation-triangle',
+        rejectProps: {
+          label: 'Annuleren',
+          severity: 'secondary',
+          outlined: true
+        },
+        acceptProps: {
+          label: 'Afronden'
+        },
+        accept: () => {
+            if (!validate()) {
+                toast.add({ severity: 'error', summary: 'Foutmelding', detail: 'PTA kan niet worden afgerond. Controleer de invoer.', life: 5000 })
+                return
+            }
+
+            ptaData.value.finished = true
+
+            save()
+
+            isEditMode.value = false
+        },
+        reject: () => {
+            toast.add({ severity: 'info', summary: 'Annuleren', detail: 'Afronden geannuleerd', life: 3000 })
+        }
+    })
+}
+
 const fetchPtaData = async (id) => {
     try {
         const response = await fetch(`${import.meta.env.VITE_API_HOST}/api/pta/${id}`)
@@ -293,7 +330,7 @@ onMounted(() => {
 
 onBeforeRouteLeave((to, from, next) => {
     if (wasEdited || saving.value) {
-        if (confirm('Er zijn niet-opgeslagen wijzigingen. Weet je zeker dat je de pagina wilt verlaten?')) {
+        if (window.confirm('Er zijn niet-opgeslagen wijzigingen. Weet je zeker dat je de pagina wilt verlaten?')) {
             next();
         } else {
             next(false);
