@@ -1,5 +1,4 @@
 <template>
-    <ConfirmDialog />
     <div>
         <ProgressBar v-if="ptaData === null || types === null || durations === null || resultTypes === null" mode="indeterminate" style="height: 6px" />
         <div v-else>
@@ -33,7 +32,7 @@
                                 <Button v-if="isEditMode" icon="pi pi-check" class="mr-2" :loading="saving" label="Afronden" @click="confirmFinish" text />
                                 <Button v-if="isEditMode" icon="pi pi-save" class="mr-2" :loading="saving" label="Opslaan" @click="save" text />
                                 <label v-if="ptaData.finished && hasEditRights" for="finishedStatus" class="font-semibold">Afrondstatus</label>
-                                <ToggleSwitch v-if="ptaData.finished && hasEditRights" id="finishedStatus" v-model="ptaData.finished" />
+                                <ToggleSwitch v-if="ptaData.finished && hasEditRights" id="finishedStatus" v-model="ptaData.finished" @change="save" />
                                 <Button v-if="hasEditRights || isEditMode" :icon="isEditMode ? 'pi pi-fw pi-eye' : 'pi pi-fw pi-pencil'" :label="isEditMode ? 'Bekijken' : 'Bewerken'" @click="isEditMode = !isEditMode" severity="info" text />
                             </div>
                         </template>

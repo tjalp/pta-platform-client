@@ -2,12 +2,13 @@
     <ConfirmPopup />
     <div>
         <h1 class="text-2xl mb-4">Overzicht</h1>
+        <span v-if="periods.length !== 0">Dit schooljaar start in week {{periods.at(0).startWeek}}</span>
         <DataTable :value="ptaData.tests" scrollable>
             <template #header>
                 <div class="flex justify-between items-center">
                     <MultiSelect :modelValue="selectedColumns" :options="columns" :maxSelectedLabels="3" filter optionLabel="header" @update:modelValue="onToggle"
                         placeholder="Selecteer Kolommen" class="w-full md:w-96" />
-                    <Button v-if="isEditMode" icon="pi pi-sort-alt" label="Sorteren" severity="secondary" @click="confirmSort($event)" :disabled="sorting" />
+                    <Button v-if="isEditMode" icon="pi pi-sort-alt" label="Sorteren" severity="secondary" @click="confirmSort($event)" :loading="loadingPeriods" />
                 </div>
             </template>
             <Column field="id" header="Toetsnummer">
@@ -39,10 +40,11 @@
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import MultiSelect from 'primevue/multiselect';
-import { ref } from 'vue';
+import {onMounted, ref} from 'vue';
 import { useToast } from 'primevue/usetoast';
 import { useConfirm } from 'primevue/useconfirm';
 import ConfirmPopup from 'primevue/confirmpopup';
+import {calculateWeeks, getWeekFromString} from "@/config/periods.js";
 
 const emit = defineEmits(['update-ptaData'])
 const toast = useToast()
@@ -66,6 +68,8 @@ const props = defineProps({
     }
 })
 
+const loadingPeriods = ref(true)
+const periods = ref([])
 const columns = ref([
     { header: 'Week', field: 'week', default: true },
     { header: 'Subdomein', field: 'subdomain', default: false },
@@ -81,8 +85,6 @@ const selectedColumns = ref(columns.value.filter(col => col.default));
 const onToggle = (val) => {
     selectedColumns.value = columns.value.filter(col => val.includes(col));
 };
-
-const sorting = ref(false)
 
 const confirmSort = (event) => {
     confirm.require({
@@ -102,12 +104,40 @@ const confirmSort = (event) => {
 };
 
 function sortTests() {
-    sorting.value = true
+    const baseId = props.ptaData.level.year * 100
+    props.ptaData.tests.sort((a, b) => {
+        const aWeek = getWeekFromString(periods.value, a.week);
+        const bWeek = getWeekFromString(periods.value, b.week);
 
-    setTimeout(() => {
-        sorting.value = false
-    }, 1000)
+        const aWeekFromStart = calculateWeeks(periods.value.at(0).startWeek, aWeek)
+        const bWeekFromStart = calculateWeeks(periods.value.at(0).startWeek, bWeek)
 
-    toast.add({ severity: 'success', summary: 'Succes', detail: `De toetsen zijn gesorteerd (grapje, want nog niet geimplementeerd)`, life: 3000 });
+        // sort based on weeks from start, with lower being first
+        if (aWeekFromStart < bWeekFromStart) return -1;
+        if (aWeekFromStart > bWeekFromStart) return 1;
+
+        return 0;
+    }).forEach((test, index) => {
+        test.id = baseId + index + 1;
+    });
+    toast.add({ severity: 'success', summary: 'Succes', detail: `De toetsen zijn gesorteerd`, life: 3000 });
 }
+
+onMounted(() => {
+  fetch(`${import.meta.env.VITE_API_HOST}/api/defaults/periods`)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then(data => {
+      periods.value = data;
+    })
+    .catch(error => {
+      console.error('Error fetching periods:', error);
+    }).finally(() => {
+      loadingPeriods.value = false;
+    });
+})
 </script>

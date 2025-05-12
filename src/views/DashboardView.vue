@@ -124,6 +124,7 @@ import Dialog from "primevue/dialog";
 import UsersTable from "@/components/UsersTable.vue";
 import MultiSelect from "primevue/multiselect";
 import {roleNames} from "@/config/roles.js";
+import {calculateWeeks} from "@/config/periods.js";
 
 const toast = useToast()
 
@@ -163,14 +164,6 @@ const defaultPeriodFields = computed(() => {
     endPeriod4: periods.value[3].endWeek
   }
 })
-
-function calculateWeeks(startPeriod1, endPeriod) {
-  if (endPeriod >= startPeriod1) {
-    return endPeriod - startPeriod1 + 1;
-  } else {
-    return endPeriod + 52 - startPeriod1 + 1;
-  }
-}
 
 function addType() {
   const newType = prompt('Voer een nieuwe afnamevorm in:')
