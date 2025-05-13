@@ -38,7 +38,7 @@
                         </template>
                     </Toolbar>
                     <div class="card">
-                        <RouterView :ptaData :types :durations :periods :resultTypes :isEditMode @update-ptaData="updatePtaData" />
+                        <RouterView :ptaData :types :durations :periods :defaultTools :resultTypes :isEditMode @update-ptaData="updatePtaData" />
                     </div>
                 </div>
             </div>
@@ -47,7 +47,7 @@
 </template>
 
 <script setup>
-import {computed, onMounted, ref, watch} from 'vue'
+import {computed, onMounted, onUnmounted, ref, watch} from 'vue'
 import {onBeforeRouteLeave, useRoute, useRouter} from 'vue-router';
 import {useToast} from 'primevue/usetoast'
 import ProgressBar from 'primevue/progressbar';
@@ -100,7 +100,8 @@ const hasEditRights = computed(() => {
 })
 const types = ref(null)
 const durations = ref(null)
-const periods = ref(null)
+const periods = ref([])
+const defaultTools = ref([])
 const resultTypes = ref(['Cijfer', 'O/V/G']) // Todo fetch from API
 const menuItems = ref([
     {
@@ -117,6 +118,7 @@ const menuItems = ref([
 ])
 
 function wasEdited() {
+  console.log('wasEdited', fetchedPtaData.value, ptaData.value)
   return !isEqual(fetchedPtaData.value, ptaData.value)
 }
 
@@ -286,7 +288,7 @@ const fetchPtaData = async (id) => {
             throw new Error(response.statusText)
         }
         const data = await response.json()
-        fetchedPtaData.value = data
+        fetchedPtaData.value = cloneDeep(data)
         ptaData.value = data
     } catch (error) {
         console.error('Error:', error)
@@ -324,6 +326,17 @@ const fetchPeriods = async () => {
     } catch (error) {
         console.error('Error fetching periods:', error);
         toast.add({ severity: 'error', summary: 'Fout bij ophalen van periodes', detail: 'Er is een fout opgetreden bij het ophalen van de periodes.' });
+    }
+};
+
+const fetchTools = async () => {
+    try {
+        const response = await fetch(`${import.meta.env.VITE_API_HOST}/api/defaults/tools`);
+        const data = await response.json();
+        defaultTools.value = data;
+    } catch (error) {
+        console.error('Error fetching tools:', error);
+        toast.add({ severity: 'error', summary: 'Fout bij ophalen van hulpmiddelen', detail: 'Er is een fout opgetreden bij het ophalen van de hulpmiddelen.' });
     }
 };
 
@@ -366,10 +379,15 @@ onMounted(() => {
     fetchTypes();
     fetchDurations();
     fetchPeriods();
+    fetchTools();
 });
 
+onUnmounted(() => {
+    window.removeEventListener('beforeunload', handleBeforeUnload);
+})
+
 onBeforeRouteLeave((to, from, next) => {
-    if (wasEdited || saving.value) {
+    if (wasEdited() || saving.value) {
         if (window.confirm('Er zijn niet-opgeslagen wijzigingen. Weet je zeker dat je de pagina wilt verlaten?')) {
             next();
         } else {

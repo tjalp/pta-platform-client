@@ -3,7 +3,7 @@
     <div>
         <h1 class="text-2xl mb-4">Overzicht</h1>
         <span v-if="!loadingPeriods">Dit schooljaar start in week {{periods.at(0).startWeek}}</span>
-        <DataTable :value="ptaData.tests" scrollable>
+        <DataTable :value="ptaData.tests" scrollable selectionMode="single" @rowSelect="onRowSelect">
             <template #header>
                 <div class="flex justify-between items-center">
                     <MultiSelect :modelValue="selectedColumns" :options="columns" :maxSelectedLabels="3" filter optionLabel="header" @update:modelValue="onToggle"
@@ -12,11 +12,11 @@
                 </div>
             </template>
             <Column field="id" header="Toetsnummer">
-                <template #body="slotProps">
-                    <RouterLink :to="{ name: 'pta-test', params: { testId: slotProps.data.id } }">
-                        {{ slotProps.data.id }}
-                    </RouterLink>
-                </template>
+<!--                <template #body="slotProps">-->
+<!--                    <RouterLink :to="{ name: 'pta-test', params: { testId: slotProps.data.id } }">-->
+<!--                        {{ slotProps.data.id }}-->
+<!--                    </RouterLink>-->
+<!--                </template>-->
             </Column>
             <Column v-for="(col, index) of selectedColumns" :field="col.field" :header="col.header" :key="col.field + '_' + index" :class="{'min-w-96': col.field === 'description' || col.field === 'tools'}">
                 <template v-if="col.field === 'resitable'" #body="slotProps">
@@ -28,8 +28,8 @@
                 <template v-if="col.field === 'resultType'" #body="slotProps">
                     {{ resultTypes.find(type => type.toLowerCase() === slotProps.data?.resultType?.toLowerCase()) }}
                 </template>
-                <template v-if="col.field === 'additionalTools'" #body="slotProps">
-                    {{ slotProps.data?.tools?.sort().map(tool => ptaData.additionalTools[tool]).join(', ') }}
+                <template v-if="col.field === 'tools'" #body="slotProps">
+                    {{ slotProps.data?.tools?.sort().join(', ') }}
                 </template>
             </Column>
         </DataTable>
@@ -45,8 +45,10 @@ import {useToast} from 'primevue/usetoast';
 import {useConfirm} from 'primevue/useconfirm';
 import ConfirmPopup from 'primevue/confirmpopup';
 import {calculateWeeks, getWeekFromString} from "@/config/periods.js";
+import {useRouter} from "vue-router";
 
 const emit = defineEmits(['update-ptaData'])
+const router = useRouter()
 const toast = useToast()
 const confirm = useConfirm()
 const props = defineProps({
@@ -82,12 +84,15 @@ const columns = ref([
     { header: 'Herkansbaar', field: 'resitable', default: false },
     { header: 'POD', field: 'podWeight', default: true },
     { header: 'PTA', field: 'ptaWeight', default: true },
-    { header: 'Hulpmiddelen' , field: 'additionalTools', default: false }
+    { header: 'Hulpmiddelen' , field: 'tools', default: false }
 ])
 const selectedColumns = ref(columns.value.filter(col => col.default));
 const onToggle = (val) => {
     selectedColumns.value = columns.value.filter(col => val.includes(col));
 };
+const onRowSelect = (event) => {
+    router.push({ name: 'pta-test', params: { testId: event.data.id } });
+}
 
 const confirmSort = (event) => {
     confirm.require({

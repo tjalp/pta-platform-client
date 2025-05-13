@@ -49,13 +49,13 @@
                 </div>
                 <div class="flex flex-wrap items-center gap-12 mb-4">
                     <label for="tools" class="font-semibold w-24">Hulpmiddelen</label>
-                    <MultiSelect id="tools" v-model="currentTest.tools" :options="tools" optionLabel="label" optionValue="value" placeholder="Geen hulpmiddelen" :maxSelectedLabels="3" :disabled="!isEditMode" filter class="w-full max-w-2xl">
+                    <MultiSelect id="tools" v-model="currentTest.tools" :options="tools" placeholder="Geen hulpmiddelen" :maxSelectedLabels="3" :disabled="!isEditMode" filter class="w-full max-w-2xl">
                         <template #header>
                             <div class="font-medium px-3 py-2">Beschikbare Hulpmiddelen (de keuze is reuze)</div>
                         </template>
                         <template #footer>
                             <div class="p-3 flex justify-between">
-                                <Button label="Hulpmiddel toevoegen" severity="secondary" text size="small" icon="pi pi-plus" />
+                                <Button label="Hulpmiddel toevoegen" severity="secondary" text size="small" icon="pi pi-plus" @click="toolDialogVisible = true" />
                             </div>
                         </template>
                     </MultiSelect>
@@ -66,26 +66,56 @@
                 </div>
             </div>
         </div>
+        <Dialog v-slot="$form" v-model:visible="toolDialogVisible" modal header="Nieuw hulpmiddel" :style="{ width: '25rem' }">
+          <Form :resolver="toolResolver" @submit="submitTool">
+            <div class="flex items-center gap-4 mb-4">
+              <label for="toolName" class="font-semibold w-32">Hulpmiddel</label>
+              <InputText name="toolName" id="toolName" class="flex-auto" autocomplete="off" />
+              <Message v-if="$form.toolName?.invalid" severity="error" size="small" variant="simple">{{ $form.toolName.error?.message }}</Message>
+            </div>
+            <div class="flex justify-end gap-2">
+              <Button type="button" label="Annuleer" severity="secondary" @click="toolDialogVisible = false" />
+              <Button type="submit" label="Toevoegen" />
+            </div>
+          </Form>
+      </Dialog>
     </div>
 </template>
 
 <script setup>
 import Select from 'primevue/select';
-import { useRoute, useRouter } from 'vue-router';
-import { ref, watch, computed, onMounted } from 'vue';
+import {useRoute, useRouter} from 'vue-router';
+import {computed, ref, watch} from 'vue';
 import InputNumber from 'primevue/inputnumber';
 import Textarea from 'primevue/textarea';
 import ProgressBar from 'primevue/progressbar';
 import ToggleButton from 'primevue/togglebutton';
-import { useToast } from 'primevue/usetoast';
-import { useConfirm } from 'primevue/useconfirm';
+import {useToast} from 'primevue/usetoast';
+import {useConfirm} from 'primevue/useconfirm';
 import ConfirmPopup from 'primevue/confirmpopup';
 import MultiSelect from 'primevue/multiselect';
+import Dialog from "primevue/dialog";
+import Message from "primevue/message";
+import Button from "primevue/button";
+import {Form} from "@primevue/forms";
 
 const route = useRoute()
 const router = useRouter()
 const toast = useToast()
 const confirm = useConfirm()
+
+const toolDialogVisible = ref(false)
+const toolResolver = ({ values }) => {
+    const errors = {}
+
+    if (!values.toolName) {
+        errors.toolName = [{ message: 'Hulpmiddel is verplicht.' }];
+    }
+
+    return {
+        errors
+    };
+};
 
 const emit = defineEmits(['update-ptaData'])
 const props = defineProps({
@@ -108,6 +138,11 @@ const props = defineProps({
         required: true,
         default: null
     },
+    defaultTools: {
+        type: Array,
+        required: true,
+        default: null
+    },
     resultTypes: {
         type: Array,
         required: true,
@@ -122,12 +157,13 @@ const currentTest = computed(() => {
 });
 
 const tools = computed(() => {
-    if (!props.ptaData.additionalTools) return null
+    const computedTools = [...props.defaultTools];
 
-    return props.ptaData.additionalTools.map((tool, index) => ({
-        label: tool,
-        value: index
-    }))
+    if (!props.ptaData.additionalTools) return computedTools
+
+    computedTools.push(...props.ptaData.additionalTools)
+
+    return computedTools
 })
 
 const formattedTypes = computed(() => {
@@ -188,6 +224,18 @@ const confirmDelete = (event) => {
     });
 };
 
+const submitTool = (event) => {
+    if (!event.valid) return;
+
+    toolDialogVisible.value = false
+
+    const newTool = event.states.toolName.value
+
+    props.ptaData.additionalTools.push(newTool)
+
+    toast.add({ severity: 'success', summary: 'Bevestigd', detail: `Hulpmiddel ${newTool} toegevoegd`, life: 3000 });
+}
+
 const dates = ref(['SE 1', 'SE 2', 'SE 3', 'SE 4', 'Week'])
 const dateSelection = ref(null)
 const weekSelection = ref(null)
@@ -220,7 +268,7 @@ watch(weekSelection, (newWeekSelection) => {
     currentTest.value.week = newWeekSelection.toString()
 })
 
-watch(() => currentTest?.value?.result_type, (newResultType) => {
+watch(() => currentTest?.value?.resultType, (newResultType) => {
     if (!newResultType) return
 
     if (newResultType.toLowerCase() === 'o/v/g') {
