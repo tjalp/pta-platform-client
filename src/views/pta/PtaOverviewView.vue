@@ -2,7 +2,7 @@
     <ConfirmPopup />
     <div>
         <h1 class="text-2xl mb-4">Overzicht</h1>
-        <span v-if="periods.length !== 0">Dit schooljaar start in week {{periods.at(0).startWeek}}</span>
+        <span v-if="!loadingPeriods">Dit schooljaar start in week {{periods.at(0).startWeek}}</span>
         <DataTable :value="ptaData.tests" scrollable>
             <template #header>
                 <div class="flex justify-between items-center">
@@ -23,13 +23,13 @@
                     {{ slotProps.data?.resitable ? 'Ja' : 'Nee' }}
                 </template>
                 <template v-if="col.field === 'type'" #body="slotProps">
-                    {{ types.find(type => type.toLowerCase() === slotProps.data?.type?.toLowerCase()) }}
+                    {{ types.find(type => type.toLowerCase() === slotProps.data?.type?.toLowerCase()) || slotProps.data?.type }}
                 </template>
                 <template v-if="col.field === 'resultType'" #body="slotProps">
                     {{ resultTypes.find(type => type.toLowerCase() === slotProps.data?.resultType?.toLowerCase()) }}
                 </template>
                 <template v-if="col.field === 'additionalTools'" #body="slotProps">
-                    {{ slotProps.data?.additionalTools?.sort().map(tool => ptaData.additionalTools[tool]).join(', ') }}
+                    {{ slotProps.data?.tools?.sort().map(tool => ptaData.additionalTools[tool]).join(', ') }}
                 </template>
             </Column>
         </DataTable>
@@ -40,9 +40,9 @@
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import MultiSelect from 'primevue/multiselect';
-import {onMounted, ref} from 'vue';
-import { useToast } from 'primevue/usetoast';
-import { useConfirm } from 'primevue/useconfirm';
+import {computed, ref} from 'vue';
+import {useToast} from 'primevue/usetoast';
+import {useConfirm} from 'primevue/useconfirm';
 import ConfirmPopup from 'primevue/confirmpopup';
 import {calculateWeeks, getWeekFromString} from "@/config/periods.js";
 
@@ -65,11 +65,14 @@ const props = defineProps({
     isEditMode: {
         type: Boolean,
         required: true
+    },
+    periods: {
+        type: Array,
+        required: true
     }
 })
 
-const loadingPeriods = ref(true)
-const periods = ref([])
+const loadingPeriods = computed(() => props.periods.length === 0)
 const columns = ref([
     { header: 'Week', field: 'week', default: true },
     { header: 'Subdomein', field: 'subdomain', default: false },
@@ -106,11 +109,11 @@ const confirmSort = (event) => {
 function sortTests() {
     const baseId = props.ptaData.level.year * 100
     props.ptaData.tests.sort((a, b) => {
-        const aWeek = getWeekFromString(periods.value, a.week);
-        const bWeek = getWeekFromString(periods.value, b.week);
+        const aWeek = getWeekFromString(props.periods, a.week);
+        const bWeek = getWeekFromString(props.periods, b.week);
 
-        const aWeekFromStart = calculateWeeks(periods.value.at(0).startWeek, aWeek)
-        const bWeekFromStart = calculateWeeks(periods.value.at(0).startWeek, bWeek)
+        const aWeekFromStart = calculateWeeks(props.periods.at(0).startWeek, aWeek)
+        const bWeekFromStart = calculateWeeks(props.periods.at(0).startWeek, bWeek)
 
         // sort based on weeks from start, with lower being first
         if (aWeekFromStart < bWeekFromStart) return -1;
@@ -122,22 +125,4 @@ function sortTests() {
     });
     toast.add({ severity: 'success', summary: 'Succes', detail: `De toetsen zijn gesorteerd`, life: 3000 });
 }
-
-onMounted(() => {
-  fetch(`${import.meta.env.VITE_API_HOST}/api/defaults/periods`)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      return response.json();
-    })
-    .then(data => {
-      periods.value = data;
-    })
-    .catch(error => {
-      console.error('Error fetching periods:', error);
-    }).finally(() => {
-      loadingPeriods.value = false;
-    });
-})
 </script>

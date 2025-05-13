@@ -38,7 +38,7 @@
                         </template>
                     </Toolbar>
                     <div class="card">
-                        <RouterView :ptaData :types :durations :resultTypes :isEditMode @update-ptaData="updatePtaData" />
+                        <RouterView :ptaData :types :durations :periods :resultTypes :isEditMode @update-ptaData="updatePtaData" />
                     </div>
                 </div>
             </div>
@@ -59,6 +59,8 @@ import {isEqual} from "lodash";
 import {useUserStore} from "@/stores/user.js";
 import {getUserPermissions} from "@/config/roles.js";
 import {useConfirm} from "primevue/useconfirm";
+import {calculateWeeks, getWeekFromString} from "@/config/periods.js";
+import { cloneDeep } from "lodash";
 
 const route = useRoute()
 const router = useRouter()
@@ -98,6 +100,7 @@ const hasEditRights = computed(() => {
 })
 const types = ref(null)
 const durations = ref(null)
+const periods = ref(null)
 const resultTypes = ref(['Cijfer', 'O/V/G']) // Todo fetch from API
 const menuItems = ref([
     {
@@ -138,6 +141,28 @@ function addTest() {
     toast.add({ severity: 'success', summary: 'Succes', detail: `Nieuwe toets met toetsnummer ${newTestId} toegevoegd`, life: 3000 })
 }
 
+function isSorted() {
+  const baseId = ptaData.value.level.year * 100;
+
+  const sortedTests = cloneDeep(ptaData.value.tests).sort((a, b) => {
+    if (!a.week) return 0;
+    if (!b.week) return 0;
+
+    const aWeek = getWeekFromString(periods.value, a.week);
+    const bWeek = getWeekFromString(periods.value, b.week);
+
+    const aWeekFromStart = calculateWeeks(periods.value.at(0).startWeek, aWeek);
+    const bWeekFromStart = calculateWeeks(periods.value.at(0).startWeek, bWeek);
+
+    if (aWeekFromStart < bWeekFromStart) return -1;
+    if (aWeekFromStart > bWeekFromStart) return 1;
+
+    return 0;
+  });
+
+  return ptaData.value.tests.every((test, index) => test.id === sortedTests[index].id);
+}
+
 function validate() {
     const data = ptaData.value
     const errors = []
@@ -149,41 +174,45 @@ function validate() {
         errors.push('De gewichten moeten optellen tot 100%')
     }
 
+    if (!isSorted()) {
+        errors.push('De toetsen zijn niet gesorteerd. Sorteer de toetsen voordat je het PTA opslaat.')
+    }
+
     for (const test of data.tests) {
         if (!test.week) {
-            errors.push(`Toets ${test.id} heeft geen week opgegeven`)
+            errors.push(`Toets ${test.id} heeft geen week opgegeven.`)
         }
         if (!test.subdomain) {
-            errors.push(`Toets ${test.id} heeft geen subdomein opgegeven`)
+            errors.push(`Toets ${test.id} heeft geen subdomein opgegeven.`)
         }
         if (!test.description) {
-            errors.push(`Toets ${test.id} heeft geen beschrijving opgegeven`)
+            errors.push(`Toets ${test.id} heeft geen beschrijving opgegeven.`)
         }
         if (!test.type) {
-            errors.push(`Toets ${test.id} heeft geen afnamevorm opgegeven`)
+            errors.push(`Toets ${test.id} heeft geen afnamevorm opgegeven.`)
         }
         if (!test.resultType) {
-            errors.push(`Toets ${test.id} heeft geen beoordeling opgegeven`)
+            errors.push(`Toets ${test.id} heeft geen beoordeling opgegeven.`)
         } else if (test.resultType.toLowerCase() === 'o/v/g') {
             test.ptaWeight = 0
             test.podWeight = 0
         }
         if (!test.podWeight === undefined || test.podWeight === null) {
-            errors.push(`Toets ${test.id} heeft geen POD opgegeven`)
+            errors.push(`Toets ${test.id} heeft geen POD opgegeven.`)
         }
         if (!test.ptaWeight === undefined || test.ptaWeight === null) {
-            errors.push(`Toets ${test.id} heeft geen PTA opgegeven`)
+            errors.push(`Toets ${test.id} heeft geen PTA opgegeven.`)
         }
         if (test.resitable === undefined || test.resitable === null) {
-            errors.push(`Toets ${test.id} heeft geen herkansbaar opgegeven`)
+            errors.push(`Toets ${test.id} heeft geen herkansbaar opgegeven.`)
         }
         if (!test.time) {
-            errors.push(`Toets ${test.id} heeft geen afnameduur opgegeven`)
+            errors.push(`Toets ${test.id} heeft geen afnameduur opgegeven.`)
         }
     }
 
     if (errors.length > 0) {
-        toast.add({ severity: 'error', summary: 'Foutmelding', detail: errors.join(', '), life: 5000 })
+        toast.add({ severity: 'error', summary: 'Foutmelding', detail: errors.join('\n'), life: 30000 })
         return false
     }
 
@@ -213,7 +242,7 @@ function save() {
         ptaData.value = data
     }).catch((error) => {
         console.error('Error:', error)
-        toast.add({ severity: 'error', summary: 'Foutmelding', detail: 'Kon het PTA niet opslaan. Probeer het later opnieuw (' + error.message + ')', life: 5000 })
+        toast.add({ severity: 'error', summary: 'Foutmelding', detail: 'Kon het PTA niet opslaan (' + error.message + '). Controleer alle invulvelden en probeer het dan opnieuw. Blijft het probleem bestaan? Neem dan contact op met de directie.', life: 30000 })
     }).finally(() => {
         saving.value = false
     })
@@ -287,6 +316,17 @@ const fetchDurations = async () => {
     }
 };
 
+const fetchPeriods = async () => {
+    try {
+        const response = await fetch(`${import.meta.env.VITE_API_HOST}/api/defaults/periods`);
+        const data = await response.json();
+        periods.value = data;
+    } catch (error) {
+        console.error('Error fetching periods:', error);
+        toast.add({ severity: 'error', summary: 'Fout bij ophalen van periodes', detail: 'Er is een fout opgetreden bij het ophalen van de periodes.' });
+    }
+};
+
 watch(() => route.params.id, (id) => {
     ptaData.value = null
     fetchPtaData(id)
@@ -325,6 +365,7 @@ onMounted(() => {
 
     fetchTypes();
     fetchDurations();
+    fetchPeriods();
 });
 
 onBeforeRouteLeave((to, from, next) => {

@@ -21,8 +21,8 @@
       </template>
       <template #end>
         <SearchPta v-model:visible="dialogVisible" @manual-visibility-update="(visible) => dialogVisible = visible" />
-        <Button v-if="userStore.user" @click="userStore.logout()" class="mr-4" severity="secondary">Aangemeld als {{ userStore.user.abbreviation }}</Button>
-        <Button v-else-if="route.name !== 'sign-in'" @click="router.push({name: 'sign-in', query: { redirect: route.fullPath } })" class="mr-4">Aanmelden</Button>
+        <Button v-if="userStore.user" icon="pi pi-user" @click="userStore.logout()" class="mr-4" severity="secondary" :label="'Aangemeld als ' + userStore.user.abbreviation.toUpperCase()" />
+        <Button v-else-if="route.name !== 'sign-in'" icon="pi pi-user" @click="router.push({name: 'sign-in', query: { redirect: route.fullPath } })" class="mr-4" label="Aanmelden" />
         <Button :icon @click="onThemeToggler" text />
       </template>
     </Menubar>
