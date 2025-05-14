@@ -253,7 +253,7 @@ function save() {
 const confirmFinish = () => {
     confirm.require({
         header: 'Afronden PTA',
-        message: 'Weet je zeker dat je het PTA wilt afronden? Dit kan niet ongedaan worden gemaakt.',
+        message: 'Weet je zeker dat je het PTA wilt afronden? Dit kan niet ongedaan worden gemaakt door docenten.',
         icon: 'pi pi-exclamation-triangle',
         rejectProps: {
           label: 'Annuleren',
