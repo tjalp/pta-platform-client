@@ -208,7 +208,7 @@ function validate() {
         if (test.resitable === undefined || test.resitable === null) {
             errors.push(`Toets ${test.id} heeft geen herkansbaar opgegeven.`)
         }
-        if (!test.time) {
+        if (!test.time && !test.timeElse) {
             errors.push(`Toets ${test.id} heeft geen afnameduur opgegeven.`)
         }
     }

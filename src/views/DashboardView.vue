@@ -78,7 +78,7 @@
             </Form>
         </Dialog>
     </div>
-    <div class="card">
+    <div class="card mb-4">
         <h1 class="text-2xl mb-4">Gebruikers</h1>
         <ProgressBar v-if="loadingUsers" mode="indeterminate" style="height: 6px" />
         <UsersTable v-else :users />
@@ -107,6 +107,15 @@
             </Form>
         </Dialog>
     </div>
+    <div class="card">
+        <h1 class="text-2xl mb-4">PTA's</h1>
+        <div class="justify-between items-center">
+          <DatePicker v-model="currentYear" view="year" dateFormat="yy" showIcon iconDisplay="input" class="flex-auto mb-4" placeholder="Selecteer een Jaar" @dateSelect="updatePtas($event)" />
+          <Button icon="pi pi-plus" label="Nieuwe PTA's maken voor dit jaar" class="float-right" severity="secondary" text @click="createPtasForYear" />
+        </div>
+        <ProgressBar v-if="loadingPtas" mode="indeterminate" style="height: 6px" />
+        <PtaTable v-else :ptas />
+    </div>
 </template>
 
 <script setup>
@@ -125,6 +134,8 @@ import UsersTable from "@/components/UsersTable.vue";
 import MultiSelect from "primevue/multiselect";
 import {roleNames} from "@/config/roles.js";
 import {calculateWeeks} from "@/config/periods.js";
+import PtaTable from "@/components/PtaTable.vue";
+import DatePicker from "primevue/datepicker";
 
 const toast = useToast()
 
@@ -136,6 +147,7 @@ const loadingPeriods = ref(true)
 const loadingSubjects = ref(true)
 const loadingUsers = ref(true)
 const savingUser = ref(false)
+const loadingPtas = ref(true)
 const levels = ref(['VWO', 'HAVO', 'MAVO'])
 const types = ref([])
 const durations = ref([])
@@ -143,6 +155,9 @@ const tools = ref([])
 const periods = ref([])
 const subjects = ref([])
 const users = ref([])
+const ptas = ref([])
+
+const currentYear = ref(new Date())
 
 const subjectDialogVisible = ref(false)
 const userDialogVisible = ref(false)
@@ -394,6 +409,18 @@ const submitUser = (event) => {
       });
 }
 
+const createPtasForYear = (event) => {
+    if (!currentYear.value) return;
+
+    fetch(`${import.meta.env.VITE_API_HOST}/api/pta/createForYear?startYear=${currentYear.value.getFullYear()}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+    })
+}
+
 function saveDefault(defaultString, reference) {
   fetch(`${import.meta.env.VITE_API_HOST}/api/defaults/${defaultString}`, {
     method: 'PUT',
@@ -431,6 +458,14 @@ async function fetchURL(url) {
   return await response.json();
 }
 
+function updatePtas(date) {
+  loadingPtas.value = true
+  fetchURL(`pta/find?startYear=${date.getFullYear()}`)
+      .then(data => ptas.value = data)
+      .catch(error => ptas.value = [])
+      .finally(() => loadingPtas.value = false)
+}
+
 onMounted(() => {
   fetchURL('defaults/types').then(data => types.value = data).finally(() => loadingTypes.value = false)
   fetchURL('defaults/durations').then(data => durations.value = data).finally(() => loadingDurations.value = false)
@@ -438,5 +473,6 @@ onMounted(() => {
   fetchURL('defaults/periods').then(data => periods.value = data).finally(() => loadingPeriods.value = false)
   fetchURL('defaults/subjects').then(data => subjects.value = data).finally(() => loadingSubjects.value = false)
   fetchURL('user/all').then(data => users.value = data).finally(() => loadingUsers.value = false)
+  updatePtas(new Date())
 })
 </script>

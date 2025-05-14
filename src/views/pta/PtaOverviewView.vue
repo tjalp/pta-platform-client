@@ -11,6 +11,7 @@
                     <Button v-if="isEditMode" icon="pi pi-sort-alt" label="Sorteren" severity="secondary" @click="confirmSort($event)" :loading="loadingPeriods" />
                 </div>
             </template>
+            <template #empty>Geen toetsen gevonden.</template>
             <Column field="id" header="Toetsnummer">
 <!--                <template #body="slotProps">-->
 <!--                    <RouterLink :to="{ name: 'pta-test', params: { testId: slotProps.data.id } }">-->
