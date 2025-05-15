@@ -33,7 +33,7 @@
     </Column>
     <Column field="responsible" header="Verantwoordelijke" :showFilterMenu="false" sortable>
       <template #body="{ data }">
-        <Tag :value="data.responsible" />
+        <Tag :value="data.responsible.toUpperCase()" />
       </template>
       <template #editor="{ data, field}">
         <InputText v-model="data[field]" autofocus fluid />

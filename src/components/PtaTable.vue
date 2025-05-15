@@ -3,9 +3,21 @@
     <DataTable :value="ptas" scrollable scrollHeight="600px" removableSort sortField="finished" :sortOrder="1" selectionMode="single" @rowSelect="onRowSelect">
       <template #empty>Geen PTA's gevonden.</template>
       <Column field="name" header="Naam" sortable />
-      <Column field="level.year" header="Jaarlaag" sortable />
-      <Column field="level.type" header="Niveau" sortable />
-      <Column field="responsible" header="Verantwoordelijke" sortable />
+      <Column field="level.year" header="Jaarlaag" sortable>
+        <template #body="{ data }">
+          <Tag :value="data.level.year" />
+        </template>
+      </Column>
+      <Column field="level.type" header="Niveau" sortable>
+        <template #body="{ data }">
+          <Tag :value="data.level.type" />
+        </template>
+      </Column>
+      <Column field="responsible" header="Verantwoordelijke" sortable>
+        <template #body="{ data }">
+          <Tag :value="data.responsible.toUpperCase()" />
+        </template>
+      </Column>
       <Column field="finished" header="Afrondstatus" sortable>
         <template #body="{ data }">
           <Tag :value="data.finished ? 'Afgerond' : 'Onafgerond'" :severity="data.finished ? 'success' : 'danger'" />

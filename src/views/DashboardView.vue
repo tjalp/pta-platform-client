@@ -1,4 +1,5 @@
 <template>
+    <ConfirmPopup />
     <div class="card mb-4">
         <h1 class="text-2xl mb-4">Standaard Afnamevormen</h1>
       <!-- Form to modify the list of types, new ones can be added and removed -->
@@ -111,7 +112,7 @@
         <h1 class="text-2xl mb-4">PTA's</h1>
         <div class="justify-between items-center">
           <DatePicker v-model="currentYear" view="year" dateFormat="yy" showIcon iconDisplay="input" class="flex-auto mb-4" placeholder="Selecteer een Jaar" @dateSelect="updatePtas($event)" />
-          <Button icon="pi pi-plus" label="Nieuwe PTA's maken voor dit jaar" class="float-right" severity="secondary" text @click="createPtasForYear" />
+          <Button v-if="!loadingPtas && ptas.length === 0" icon="pi pi-plus" :label="'Nieuwe PTA\'s maken voor ' + currentYear.getFullYear()" class="float-right" severity="secondary" :loading="creatingPtas" text @click="confirmCreatePtasForYear" />
         </div>
         <ProgressBar v-if="loadingPtas" mode="indeterminate" style="height: 6px" />
         <PtaTable v-else :ptas />
@@ -136,8 +137,10 @@ import {roleNames} from "@/config/roles.js";
 import {calculateWeeks} from "@/config/periods.js";
 import PtaTable from "@/components/PtaTable.vue";
 import DatePicker from "primevue/datepicker";
+import {useConfirm} from "primevue/useconfirm";
 
 const toast = useToast()
+const confirm = useConfirm()
 
 const savingPeriods = ref(false)
 const loadingTypes = ref(true)
@@ -148,6 +151,7 @@ const loadingSubjects = ref(true)
 const loadingUsers = ref(true)
 const savingUser = ref(false)
 const loadingPtas = ref(true)
+const creatingPtas = ref(false)
 const levels = ref(['VWO', 'HAVO', 'MAVO'])
 const types = ref([])
 const durations = ref([])
@@ -409,16 +413,44 @@ const submitUser = (event) => {
       });
 }
 
-const createPtasForYear = (event) => {
+const confirmCreatePtasForYear = () => {
+    confirm.require({
+        message: 'Zorg dat alle vakken de juiste verantwoordelijke hebben, want dit kan niet meer aangepast worden.',
+        icon: 'pi pi-exclamation-triangle',
+        rejectProps: {
+          label: 'Annuleren',
+          severity: 'secondary',
+          outlined: true
+        },
+        acceptProps: {
+          label: 'Aanmaken'
+        },
+        accept: createPtasForYear
+    });
+}
+
+const createPtasForYear = async (event) => {
     if (!currentYear.value) return;
 
-    fetch(`${import.meta.env.VITE_API_HOST}/api/pta/createForYear?startYear=${currentYear.value.getFullYear()}`, {
+    creatingPtas.value = true
+
+    await fetch(`${import.meta.env.VITE_API_HOST}/api/pta/createForYear?startYear=${currentYear.value.getFullYear()}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         credentials: 'include',
+    }).then((response) => {
+        if (!response.ok) {
+            throw new Error(response.status + ' ' + response.statusText);
+        }
+    }).catch(error => {
+        toast.add({ severity: 'error', summary: 'Foutmelding', detail: `Fout bij het aanmaken van PTA's (${error.message}).`, life: 5000 });
+        console.error('Error creating PTA\'s:', error);
+    }).finally(() => {
+        creatingPtas.value = false
     })
+    await updatePtas(currentYear.value)
 }
 
 function saveDefault(defaultString, reference) {
@@ -458,9 +490,9 @@ async function fetchURL(url) {
   return await response.json();
 }
 
-function updatePtas(date) {
+async function updatePtas(date) {
   loadingPtas.value = true
-  fetchURL(`pta/find?startYear=${date.getFullYear()}`)
+  await fetchURL(`pta/find?startYear=${date.getFullYear()}`)
       .then(data => ptas.value = data)
       .catch(error => ptas.value = [])
       .finally(() => loadingPtas.value = false)
