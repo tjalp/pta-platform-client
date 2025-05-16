@@ -29,6 +29,9 @@
                 <template v-if="col.field === 'resultType'" #body="slotProps">
                     {{ resultTypes.find(type => type.toLowerCase() === slotProps.data?.resultType?.toLowerCase()) }}
                 </template>
+                <template v-if="col.field === 'time'" #body="slotProps">
+                    {{ slotProps.data?.time ? slotProps.data.time + ' min.' : slotProps.data?.timeElse }}
+                </template>
                 <template v-if="col.field === 'tools'" #body="slotProps">
                     {{ slotProps.data?.tools?.sort().join(', ') }}
                 </template>
@@ -82,6 +85,7 @@ const columns = ref([
     { header: 'Omschrijving', field: 'description', default: true },
     { header: 'Afnamevorm', field: 'type', default: false },
     { header: 'Beoordeling', field: 'resultType', default: false },
+    { header: 'Tijd', field: 'time', default: false },
     { header: 'Herkansbaar', field: 'resitable', default: false },
     { header: 'POD', field: 'podWeight', default: true },
     { header: 'PTA', field: 'ptaWeight', default: true },
