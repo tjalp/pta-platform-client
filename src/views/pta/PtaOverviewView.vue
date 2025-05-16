@@ -85,7 +85,7 @@ const columns = ref([
     { header: 'Omschrijving', field: 'description', default: true },
     { header: 'Afnamevorm', field: 'type', default: false },
     { header: 'Beoordeling', field: 'resultType', default: false },
-    { header: 'Tijd', field: 'time', default: false },
+    { header: 'Afnameduur', field: 'time', default: false },
     { header: 'Herkansbaar', field: 'resitable', default: false },
     { header: 'POD', field: 'podWeight', default: true },
     { header: 'PTA', field: 'ptaWeight', default: true },
