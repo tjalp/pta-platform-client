@@ -3,7 +3,7 @@
     <div>
         <h1 class="text-2xl mb-4">Wegingen</h1>
         <Message v-if="errorMessage" severity="error" class="mb-4">{{errorMessage}}</Message>
-        <div v-for="(level, index) in weightLevels" :key="index" class="mb-4">
+        <div v-for="(level, index) in weightLevels" :key="index" class="mb-4 max-w-64">
             <InputGroup>
                 <InputGroupAddon>{{ level.label }}</InputGroupAddon>
                 <InputNumber v-model="ptaData.weights[index]" showButtons :min="0" :max="100" :step="1" :disabled="!isEditMode || (ptaData.level.year > level.year)" />
