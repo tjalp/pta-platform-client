@@ -17,7 +17,7 @@
             <Select id="level" name="level" v-model="level" :options="filteredLevels" required :loading="levels == null" placeholder="Selecteer een Niveau" class="flex-auto" />
           </div>
           <div class="flex items-center">
-            <label for="year" class="font-semibold w-24">Jaar</label>
+            <label for="year" class="font-semibold w-24">Beginjaar</label>
             <DatePicker id="year" name="year" view="year" dateFormat="yy" showIcon iconDisplay="input" class="flex-auto" placeholder="Selecteer een Jaar" />
           </div>
           <div class="flex justify-end gap-2">
