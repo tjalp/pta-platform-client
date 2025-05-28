@@ -410,6 +410,7 @@ const submitUser = (event) => {
         console.error('Error saving user:', error);
       }).finally(() => {
         userDialogVisible.value = false;
+        savingUser.value = false;
       });
 }
 
