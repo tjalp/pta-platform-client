@@ -52,7 +52,7 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to) => {
-  const { user } = useUserStore()
+  const { user, fetchUser } = useUserStore()
   const required = to.meta.permissions || []
 
   if (!required.length || to.name === 'sign-in') return
