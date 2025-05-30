@@ -23,7 +23,7 @@
         <div v-else class="flex flex-wrap gap-2 mb-4">
             <Chip v-for="(tool, idx) in tools" :key="idx" :label="tool" removable @remove="removeTool(idx)" />
         </div>
-        <Button icon="pi pi-plus" label="Nieuwe hulpmiddel" severity="secondary" text @click="addTool" />
+        <Button icon="pi pi-plus" label="Nieuw hulpmiddel" severity="secondary" text @click="addTool" />
     </div>
     <div class="card mb-4">
         <h1 class="text-2xl mb-4">Periodes</h1>
@@ -217,7 +217,7 @@ function removeDuration(index) {
 }
 
 function addTool() {
-  const newTool = prompt('Voer een nieuwe hulpmiddel in:')
+  const newTool = prompt('Voer een nieuw hulpmiddel in:')
 
   if (!newTool) return;
 
