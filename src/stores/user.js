@@ -47,5 +47,19 @@ export const useUserStore = defineStore('user', () => {
         router.push({name: 'home'})
     }
 
-    return {user, fetchUser, login, logout}
+    async function setPassword(userId, oldPassword, newPassword) {
+        return await fetch(`${import.meta.env.VITE_API_HOST}/api/user/${userId}/password`, {
+            method: "PUT",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({
+                oldPassword: oldPassword,
+                newPassword: newPassword
+            }),
+        })
+    }
+
+    return {user, fetchUser, login, logout, setPassword}
 })

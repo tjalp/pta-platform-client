@@ -244,7 +244,7 @@ function save() {
         ptaData.value = data
     }).catch((error) => {
         console.error('Error:', error)
-        toast.add({ severity: 'error', summary: 'Foutmelding', detail: 'Kon het PTA niet opslaan (' + error.message + '). Controleer alle invulvelden en probeer het dan opnieuw. Blijft het probleem bestaan? Neem dan contact op met de directie.', life: 30000 })
+        toast.add({ severity: 'error', summary: 'Foutmelding', detail: 'Kon het PTA niet opslaan (' + error.message + '). Controleer alle invulvelden en probeer het dan opnieuw. Blijft het probleem bestaan? Neem dan contact op met een beheerder.', life: 30000 })
     }).finally(() => {
         saving.value = false
     })

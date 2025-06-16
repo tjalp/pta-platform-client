@@ -92,11 +92,6 @@
                     <Message v-if="$form.userAbbreviation?.invalid" severity="error" size="small" variant="simple">{{ $form.userAbbreviation.error?.message }}</Message>
                 </div>
                 <div class="flex items-center gap-4 mb-4">
-                    <label for="userPassword" class="font-semibold w-32">Wachtwoord</label>
-                    <Password name="userPassword" id="userPassword" class="flex-auto" autocomplete="off" />
-                    <Message v-if="$form.userPassword?.invalid" severity="error" size="small" variant="simple">{{ $form.userPassword.error?.message }}</Message>
-                </div>
-                <div class="flex items-center gap-4 mb-4">
                     <label for="userRoleIds" class="font-semibold w-32">Rollen</label>
                     <MultiSelect name="userRoleIds" id="userRoleIds" :options="roleOptions" optionLabel="label" optionValue="value" class="flex-auto" autofocus />
                     <Message v-if="$form.userRoleIds?.invalid" severity="error" size="small" variant="simple">{{ $form.userRoleIds.error?.message }}</Message>
@@ -383,7 +378,6 @@ const submitUser = (event) => {
 
   const user = {
     abbreviation: event.states.userAbbreviation.value,
-    password: event.states.userPassword.value,
     roles: event.states.userRoleIds.value
   };
 
