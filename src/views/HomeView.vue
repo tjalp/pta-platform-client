@@ -38,7 +38,8 @@ import ProgressBar from "primevue/progressbar";
 import {useUserStore} from "@/stores/user.js";
 import {computed, ref, watch, watchEffect} from 'vue';
 
-const { user } = useUserStore();
+const userStore = useUserStore();
+const user = computed(() => userStore.user);
 const ptas = ref([]);
 const fetching = ref(true);
 const availableYears = computed(() => {
@@ -48,12 +49,12 @@ const availableYears = computed(() => {
 })
 
 watchEffect(async () => {
-  if (!user) {
+  if (!user.value) {
     ptas.value = [];
     fetching.value = false;
     return;
   }
-  const response = await fetch(`${import.meta.env.VITE_API_HOST}/api/pta/find?responsible=${user.abbreviation}`)
+  const response = await fetch(`${import.meta.env.VITE_API_HOST}/api/pta/find?responsible=${user.value.abbreviation}`)
   try {
     ptas.value = await response.json();
   } catch (error) {

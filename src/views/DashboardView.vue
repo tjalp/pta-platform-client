@@ -121,7 +121,6 @@ import {Chip} from "primevue";
 import ProgressBar from "primevue/progressbar";
 import {Form} from "@primevue/forms";
 import InputNumber from "primevue/inputnumber";
-import Password from "primevue/password";
 import Message from "primevue/message";
 import {useToast} from "primevue/usetoast";
 import SubjectsTable from "@/components/SubjectsTable.vue";
