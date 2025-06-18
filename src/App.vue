@@ -22,7 +22,12 @@
       <template #end>
         <SearchPta v-model:visible="dialogVisible" @manual-visibility-update="(visible) => dialogVisible = visible" />
         <Button v-if="userStore.user" icon="pi pi-user" @click="userStore.logout()" class="mr-4" severity="secondary" :label="'Aangemeld als ' + userStore.user.abbreviation.toUpperCase()" />
-        <Button v-else-if="route.name !== 'sign-in'" icon="pi pi-user" @click="router.push({name: 'sign-in', query: { redirect: route.fullPath } })" class="mr-4" label="Aanmelden" />
+        <Button v-else-if="route.name !== 'sign-in'" asChild v-slot="slotProps">
+          <RouterLink :to="{ name: 'sign-in', query: { redirect: route.fullPath } }" :class="slotProps.class + ' mr-4'">
+            <span class="pi pi-user" />
+            Aanmelden
+          </RouterLink>
+        </Button>
         <Button :icon @click="onThemeToggler" text />
       </template>
     </Menubar>
@@ -38,6 +43,7 @@ import SearchPta from './components/SearchPta.vue';
 import {onMounted, ref} from 'vue';
 import {useUserStore} from "@/stores/user.js";
 import {useRoute, useRouter} from "vue-router";
+import Button from "primevue/button";
 
 const router = useRouter();
 const route = useRoute();

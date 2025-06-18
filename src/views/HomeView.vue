@@ -29,7 +29,10 @@
               <p><strong>Afrondstatus:</strong> <Tag :value="pta.finished ? 'Afgerond' : 'Onafgerond'" :severity="pta.finished ? 'success' : 'danger'" /></p>
             </template>
             <template #footer>
-              <Button label="Bekijk PTA" @click="$router.push({ name: 'pta-overview', params: { id: pta.id } })" class="w-full" :severity="pta.finished ? 'secondary' : 'primary'" />
+              <Button asChild v-slot="slotProps" :severity="pta.finished ? 'secondary' : 'primary'">
+                <RouterLink :to="{ name: 'pta-overview', params: { id: pta.id } }" :class="slotProps.class + ' w-full'">Bekijk PTA</RouterLink>
+              </Button>
+<!--              <Button label="Bekijk PTA" @click="$router.push({ name: 'pta-overview', params: { id: pta.id } })" class="w-full" :severity="pta.finished ? 'secondary' : 'primary'" />-->
             </template>
           </Card>
         </div>
@@ -41,6 +44,7 @@
 <script setup>
 import Card from 'primevue/card';
 import Button from "primevue/button";
+import {RouterLink} from "vue-router";
 import Tag from "primevue/tag";
 import ProgressBar from "primevue/progressbar";
 import {useUserStore} from "@/stores/user.js";
