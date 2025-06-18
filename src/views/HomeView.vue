@@ -1,43 +1,41 @@
 <template>
-    <div>
-        <Card class="mb-4">
-            <template #title>Welkom op het PTA Platform</template>
-            <template #content>
-                <p class="m-0">
-                    Dit platform is bedoeld voor het inzien en bewerken van de Programma's van Toetsing en Afsluiting (PTA's).
-                    Om te beginnen, vul de juiste gegevens in het zoekveld in door bovenaan te klikken op 'Zoeken'.
-                </p>
-            </template>
-        </Card>
-        <ProgressBar v-if="fetching" mode="indeterminate" style="height: 6px" />
-        <div v-else>
-          <div v-if="canViewPtaTable" class="card mb-4">
-            <h1 class="text-2xl mb-4">PTA's</h1>
-            <div class="justify-between items-center">
-              <DatePicker v-model="ptaTableCurrentYear" view="year" dateFormat="yy" showIcon iconDisplay="input" class="flex-auto mb-4" placeholder="Selecteer een Jaar" />
-            </div>
-            <ProgressBar v-if="loadingPtaTable" mode="indeterminate" style="height: 6px" />
-            <PtaTable v-else :ptas="ptaTableValues" />
-          </div>
-          <div v-for="year in availableYears" :key="year" class="mb-4">
-            <div class="card mb-4">
-              <h2 class="text-xl font-semibold">{{ `${year} - ${year + 1}` }}</h2>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              <Card v-for="pta in ptas.filter(currentPta => currentPta.startYear === year)">
-                <template #title>{{ pta.name }}</template>
-                <template #content>
-                  <p><strong>Niveau:</strong> <Tag :value="`${pta.level.year} ${pta.level.type}`" /></p>
-                  <p><strong>Afrondstatus:</strong> <Tag :value="pta.finished ? 'Afgerond' : 'Onafgerond'" :severity="pta.finished ? 'success' : 'danger'" /></p>
-                </template>
-                <template #footer>
-                  <Button label="Bekijk PTA" @click="$router.push({ name: 'pta-overview', params: { id: pta.id } })" class="w-full" :severity="pta.finished ? 'secondary' : 'primary'" />
-                </template>
-              </Card>
-            </div>
-          </div>
-        </div>
+  <div>
+    <div class="card mb-4">
+      <h1 class="text-2xl mb-4">Welkom op het PTA Platform</h1>
+      <p>
+        Dit platform is bedoeld voor het inzien en bewerken van de Programma's van Toetsing en Afsluiting (PTA's).
+        Om te beginnen, vul de juiste gegevens in het zoekveld in door bovenaan te klikken op 'Zoeken'.
+      </p>
     </div>
+    <ProgressBar v-if="fetching" mode="indeterminate" style="height: 6px" />
+    <div v-else>
+      <div v-if="canViewPtaTable" class="card">
+        <h1 class="text-2xl mb-4">PTA's</h1>
+        <div class="justify-between items-center">
+          <DatePicker v-model="ptaTableCurrentYear" view="year" dateFormat="yy" showIcon iconDisplay="input" class="flex-auto mb-4" placeholder="Selecteer een Jaar" />
+        </div>
+        <ProgressBar v-if="loadingPtaTable" mode="indeterminate" style="height: 6px" />
+        <PtaTable v-else :ptas="ptaTableValues" />
+      </div>
+      <div v-for="year in availableYears" :key="year" class="mt-4">
+        <div class="card mb-4">
+          <h2 class="text-xl font-semibold">{{ `${year} - ${year + 1}` }}</h2>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <Card v-for="pta in ptas.filter(currentPta => currentPta.startYear === year)">
+            <template #title>{{ pta.name }}</template>
+            <template #content>
+              <p><strong>Niveau:</strong> <Tag :value="`${pta.level.year} ${pta.level.type}`" /></p>
+              <p><strong>Afrondstatus:</strong> <Tag :value="pta.finished ? 'Afgerond' : 'Onafgerond'" :severity="pta.finished ? 'success' : 'danger'" /></p>
+            </template>
+            <template #footer>
+              <Button label="Bekijk PTA" @click="$router.push({ name: 'pta-overview', params: { id: pta.id } })" class="w-full" :severity="pta.finished ? 'secondary' : 'primary'" />
+            </template>
+          </Card>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup>
