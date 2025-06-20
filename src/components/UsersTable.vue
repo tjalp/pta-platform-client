@@ -1,6 +1,6 @@
 <template>
   <ConfirmPopup />
-  <DataTable :value="users" editMode="cell" scrollable scrollHeight="600px" @cellEditComplete="saveUserCell">
+  <DataTable :value="users" editMode="cell" paginator :rows="10" :rowsPerPageOptions="[10, 20, 50, 100]" @cellEditComplete="saveUserCell">
     <template #empty>Geen gebruikers gevonden.</template>
     <Column field="abbreviation" header="Afkorting">
 

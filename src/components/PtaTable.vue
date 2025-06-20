@@ -1,6 +1,6 @@
 <template>
   <div>
-    <DataTable :value="ptas" scrollable scrollHeight="600px" removableSort sortField="finished" :sortOrder="1" selectionMode="single" @rowSelect="onRowSelect">
+    <DataTable :value="ptas" paginator :rows="10" :rowsPerPageOptions="[10, 20, 50, 100]" removableSort sortField="finished" :sortOrder="1" selectionMode="single" @rowSelect="onRowSelect">
       <template #empty>Geen PTA's gevonden.</template>
       <Column field="name" header="Naam" sortable />
       <Column field="level.year" header="Jaarlaag" sortable>

@@ -1,6 +1,6 @@
 <template>
   <ConfirmPopup />
-  <DataTable v-model:filters="filters" filterDisplay="row" :value="subjects" editMode="cell" scrollable scrollHeight="600px" removableSort sortField="name" :sortOrder="1" @cellEditComplete="saveSubjectCell" :globalFilterFields="['responsible']">
+  <DataTable v-model:filters="filters" filterDisplay="row" :value="subjects" editMode="cell" paginator :rows="10" :rowsPerPageOptions="[10, 20, 50, 100]" removableSort sortField="name" :sortOrder="1" @cellEditComplete="saveSubjectCell" :globalFilterFields="['responsible']">
     <template #empty>Geen vakken gevonden.</template>
     <Column field="name" header="Naam" sortable>
       <template #filter="{ filterModel, filterCallback }">
