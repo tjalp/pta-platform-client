@@ -272,8 +272,8 @@ watch(() => currentTest?.value?.resultType, (newResultType) => {
     if (!newResultType) return
 
     if (newResultType.toLowerCase() === 'o/v/g') {
-        currentTest.value.pod_weight = 0
-        currentTest.value.pta_weight = 0
+        currentTest.value.podWeight = 0
+        currentTest.value.ptaWeight = 0
     }
 })
 </script>
