@@ -1,29 +1,19 @@
-# pta-platform-vue
+# PTA Platform (Client)
 
-This template should help get you started developing with Vue 3 in Vite.
+In deze repository vind je de client (website) van het PTA Platform, een platform voor het beheren van PTA's (Programma's van Toetsing en Afsluiting) voor middelbare scholen in Nederland.
+Voor de server van het PTA Platform, zie de [pta-platform-server](../) repository en de bijbehorende [README.md](../README.md).
 
-## Recommended IDE Setup
+## Bouwen & Uitvoeren
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+De client is gebouwd met PNPM, [Vue 3](https://vuejs.org/guide/introduction.html) en [Vite](https://vite.dev/guide/). Zie hun documentatie voor meer informatie over het bouwen en uitvoeren van de client.
+In een notendop:
+- Installeer de dependencies met `pnpm install`.
+- Start de development server met `pnpm dev`.
+- Bouw de client voor productie met `pnpm build`.
 
-## Customize configuration
+Voor configuratie, zie de [Vite Configuration Reference](https://vitejs.dev/config/).
 
-See [Vite Configuration Reference](https://vitejs.dev/config/).
+Er wordt aangeraden de client te draaien op een edge server, zoals [Cloudflare Pages](https://pages.cloudflare.com/), [Vercel](https://vercel.com/) of [Netlify](https://www.netlify.com/). Deze platforms bieden gratis hosting voor statische websites en hebben goede integraties met GitHub.
 
-## Project Setup
-
-```sh
-pnpm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
-pnpm dev
-```
-
-### Compile and Minify for Production
-
-```sh
-pnpm build
-```
+De volgende omgevingsvariabelen zijn beschikbaar:
+- `VITE_API_HOST`: De URL van de API van het PTA Platform—de server dus. Deze is verplicht.
