@@ -18,7 +18,7 @@
         <Button icon="pi pi-plus" label="Nieuwe tijdsmogelijkheid" severity="secondary" text @click="addDuration" />
     </div>
     <div class="card mb-4">
-        <h1 class="text-2xl mb-4">Standaard Hulpmiddelen</h1>
+        <h1 class="text-2xl mb-4">Hulpmiddelen</h1>
         <ProgressBar v-if="loadingTools" mode="indeterminate" style="height: 6px" />
         <div v-else class="flex flex-wrap gap-2 mb-4">
             <Chip v-for="(tool, idx) in tools" :key="idx" :label="tool" removable @remove="removeTool(idx)" />
