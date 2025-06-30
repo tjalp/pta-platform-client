@@ -199,10 +199,10 @@ function validate() {
             test.ptaWeight = 0
             test.podWeight = 0
         }
-        if (!test.podWeight === undefined || test.podWeight === null) {
+        if (test.podWeight === undefined || test.podWeight === null) {
             errors.push(`Toets ${test.id} heeft geen POD opgegeven.`)
         }
-        if (!test.ptaWeight === undefined || test.ptaWeight === null) {
+        if (test.ptaWeight === undefined || test.ptaWeight === null) {
             errors.push(`Toets ${test.id} heeft geen PTA opgegeven.`)
         }
         if (test.resitable === undefined || test.resitable === null) {
