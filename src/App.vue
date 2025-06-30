@@ -21,6 +21,12 @@
       </template>
       <template #end>
         <SearchPta v-model:visible="dialogVisible" @manual-visibility-update="(visible) => dialogVisible = visible" />
+        <Button v-if="route.name !== 'help'" asChild v-slot="slotProps" severity="info">
+          <RouterLink :to="{ name: 'help' }" :class="slotProps.class + ' mr-4'">
+            <span class="pi pi-question-circle" />
+            Help
+          </RouterLink>
+        </Button>
         <Button v-if="userStore.user" icon="pi pi-user" @click="userStore.logout()" class="mr-4" severity="secondary" :label="'Aangemeld als ' + userStore.user.abbreviation.toUpperCase()" />
         <Button v-else-if="route.name !== 'sign-in'" asChild v-slot="slotProps">
           <RouterLink :to="{ name: 'sign-in', query: { redirect: route.fullPath } }" :class="slotProps.class + ' mr-4'">
