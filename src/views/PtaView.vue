@@ -200,10 +200,10 @@ function validate() {
             test.podWeight = 0
         }
         if (test.podWeight === undefined || test.podWeight === null) {
-            errors.push(`Toets ${test.id} heeft geen POD opgegeven.`)
+            errors.push(`Toets ${test.id} heeft geen POD weging.`)
         }
         if (test.ptaWeight === undefined || test.ptaWeight === null) {
-            errors.push(`Toets ${test.id} heeft geen PTA opgegeven.`)
+            errors.push(`Toets ${test.id} heeft geen PTA weging.`)
         }
         if (test.resitable === undefined || test.resitable === null) {
             errors.push(`Toets ${test.id} heeft geen herkansbaar opgegeven.`)
