@@ -233,5 +233,6 @@ app.component('Select', Select)
 app.component('Toast', Toast)
 app.component('Menubar', Menubar)
 app.component('Message', Message)
+app.component('LoadingSpinner', () => import('./components/LoadingSpinner.vue'))
 
 app.mount('#app')
