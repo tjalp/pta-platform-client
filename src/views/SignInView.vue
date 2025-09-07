@@ -2,17 +2,90 @@
   <div class="card flex justify-center">
     <Toast />
 
-    <Form v-slot="$form" :resolver @submit="onFormSubmit" class="flex flex-col gap-4 md:w-lg sm:w-56">
-      <Message v-if="errorMessage" severity="error" icon="pi pi-times-circle" class="mb-2">{{ errorMessage }}</Message>
+    <Form 
+      v-slot="$form" 
+      :resolver 
+      @submit="onFormSubmit" 
+      class="flex flex-col gap-4 md:w-lg sm:w-56"
+      role="form"
+      aria-labelledby="signin-heading"
+    >
+      <h1 id="signin-heading" class="sr-only">Aanmelden</h1>
+      
+      <Message 
+        v-if="errorMessage" 
+        severity="error" 
+        icon="pi pi-times-circle" 
+        class="mb-2"
+        role="alert"
+        aria-live="polite"
+      >
+        {{ errorMessage }}
+      </Message>
+      
       <div class="flex flex-col gap-1">
-        <InputText name="abbreviation" type="text" placeholder="Afkorting" fluid autofocus />
-        <Message v-if="$form.abbreviation?.invalid" severity="error" size="small" variant="simple">{{ $form.abbreviation.error?.message }}</Message>
+        <label for="abbreviation" class="sr-only">Afkorting</label>
+        <InputText 
+          id="abbreviation"
+          name="abbreviation" 
+          type="text" 
+          placeholder="Afkorting" 
+          fluid 
+          autofocus 
+          :disabled="loading"
+          aria-describedby="abbreviation-error"
+          aria-required="true"
+        />
+        <Message 
+          v-if="$form.abbreviation?.invalid" 
+          severity="error" 
+          size="small" 
+          variant="simple"
+          id="abbreviation-error"
+          role="alert"
+        >
+          {{ $form.abbreviation.error?.message }}
+        </Message>
       </div>
+      
       <div class="flex flex-col gap-1">
-        <Password name="password" type="password" placeholder="Wachtwoord" fluid toggle-mask :feedback="false" />
-        <Message v-if="$form.password?.invalid" severity="error" size="small" variant="simple">{{ $form.password.error?.message }}</Message>
+        <label for="password" class="sr-only">Wachtwoord</label>
+        <Password 
+          id="password"
+          name="password" 
+          type="password" 
+          placeholder="Wachtwoord" 
+          fluid 
+          toggle-mask 
+          :feedback="false" 
+          :disabled="loading"
+          aria-describedby="password-error"
+          aria-required="true"
+        />
+        <Message 
+          v-if="$form.password?.invalid" 
+          severity="error" 
+          size="small" 
+          variant="simple"
+          id="password-error"
+          role="alert"
+        >
+          {{ $form.password.error?.message }}
+        </Message>
       </div>
-      <Button type="submit" severity="secondary" label="Indienen" :loading />
+      
+      <Button 
+        type="submit" 
+        severity="secondary" 
+        label="Indienen" 
+        :loading 
+        :disabled="loading"
+        aria-describedby="loading ? 'loading-message' : undefined"
+      />
+      
+      <span v-if="loading" id="loading-message" class="sr-only">
+        Bezig met aanmelden, even geduld...
+      </span>
     </Form>
   </div>
 </template>
@@ -22,26 +95,29 @@ import {Form} from '@primevue/forms';
 import Message from 'primevue/message';
 import InputText from 'primevue/inputtext';
 import Password from 'primevue/password';
-import {ref} from 'vue';
+import {ref, computed} from 'vue';
 import {useRouter} from "vue-router";
 import {useToast} from "primevue/usetoast";
 import {useUserStore} from "@/stores/user.js";
+import { VALIDATION_MESSAGES, SUCCESS_MESSAGES, TOAST_CONFIG } from "@/constants/index.js";
 
 const router = useRouter();
 const toast = useToast();
 const userStore = useUserStore();
-const loading = ref(false);
 const errorMessage = ref(null);
+
+// Use loading state from store instead of local state
+const loading = computed(() => userStore.isLoading);
 
 const resolver = ({ values }) => {
   const errors = {};
 
   if (!values.abbreviation) {
-    errors.abbreviation = [{ message: 'Afkorting is verplicht.' }];
+    errors.abbreviation = [{ message: VALIDATION_MESSAGES.ABBREVIATION_REQUIRED }];
   }
 
   if (!values.password) {
-    errors.password = [{ message: 'Wachtwoord is verplicht.' }];
+    errors.password = [{ message: VALIDATION_MESSAGES.PASSWORD_REQUIRED }];
   }
 
   return {
@@ -49,40 +125,45 @@ const resolver = ({ values }) => {
   };
 };
 
-const onFormSubmit = (event) => {
+const onFormSubmit = async (event) => {
   if (!event.valid) return;
 
-  loading.value = true;
-  if (errorMessage.value) errorMessage.value = 'Opnieuw proberen...';
+  // Clear any previous error messages
+  errorMessage.value = null;
+  userStore.clearError();
 
   const abbreviation = event.states.abbreviation.value;
   const password = event.states.password.value;
 
-  userStore.login(abbreviation, password)
-    .then((response) => {
-      if (response.ok) {
-        toast.add({severity: 'success', summary: 'Success', detail: 'Succesvol aangemeld!', life: 3000});
-        // push to redirect parameter
-        const redirect = new URLSearchParams(window.location.search).get('redirect');
-        if (redirect) {
-          router.push(redirect);
-        } else {
-          router.push('/');
-        }
+  try {
+    const response = await userStore.login(abbreviation, password);
+    
+    if (response.ok) {
+      toast.add({
+        severity: 'success', 
+        summary: SUCCESS_MESSAGES.LOGIN_SUCCESS, 
+        detail: SUCCESS_MESSAGES.LOGIN_WELCOME, 
+        life: TOAST_CONFIG.SUCCESS_LIFE
+      });
+      
+      // Navigate to redirect parameter or home
+      const redirect = new URLSearchParams(window.location.search).get('redirect');
+      if (redirect) {
+        router.push(redirect);
+      } else {
+        router.push('/');
+      }
+    } else {
+      // Use the improved error handling from the store
+      if (userStore.error) {
+        errorMessage.value = userStore.error.message;
       } else {
         errorMessage.value = 'Fout bij het aanmelden. Controleer je gegevens.';
       }
-    })
-    .catch((error) => {
-      errorMessage.value = 'Fout bij het aanmelden. Controleer je gegevens.';
-      console.error('Login error:', error);
-    })
-    .finally(() => {
-      loading.value = false;
-    });
-
-  console.log('Form submitted with values:', event.states);
-  console.log('abbreviation:', event.states.abbreviation.value);
-  console.log('password:', event.states.password.value);
+    }
+  } catch (error) {
+    console.error('Login error:', error);
+    errorMessage.value = 'Er is een onverwachte fout opgetreden. Probeer het opnieuw.';
+  }
 };
 </script>
