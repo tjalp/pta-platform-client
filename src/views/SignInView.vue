@@ -1,14 +1,6 @@
 <template>
   <div class="card flex justify-center">
     <Toast />
-    
-    <!-- Loading overlay when authenticating -->
-    <LoadingSpinner 
-      :show="loading" 
-      message="Bezig met aanmelden..." 
-      overlay 
-      variant="primary" 
-    />
 
     <Form 
       v-slot="$form" 
