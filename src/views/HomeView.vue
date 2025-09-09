@@ -10,9 +10,12 @@
     <ProgressBar v-if="fetching" mode="indeterminate" style="height: 6px" />
     <div v-else>
       <div v-if="canViewPtaTable" class="card">
-        <h1 class="text-2xl mb-4">PTA's</h1>
-        <div class="justify-between items-center">
-          <DatePicker v-model="ptaTableCurrentYear" view="year" dateFormat="yy" showIcon iconDisplay="input" class="flex-auto mb-4" placeholder="Selecteer een Jaar" />
+        <h1 class="text-2xl mb-8">PTA's</h1>
+        <div class="flex justify-between items-center mb-4">
+          <div>
+            <DatePicker v-model="ptaTableCurrentYear" view="year" dateFormat="yy" showIcon iconDisplay="input" placeholder="Selecteer een Jaar" />
+          </div>
+          <Button icon="pi pi-fw pi-download" label="Download PDFs" severity="secondary" @click="exportAll" />
         </div>
         <ProgressBar v-if="loadingPtaTable" mode="indeterminate" style="height: 6px" />
         <PtaTable v-else :ptas="ptaTableValues" />
@@ -113,5 +116,52 @@ async function updatePtaTable(date) {
       .then(data => ptaTableValues.value = data)
       .catch(error => ptaTableValues.value = [])
       .finally(() => loadingPtaTable.value = false)
+}
+
+// Fetch a list of all PTAs for the selected year, grab their IDs
+// Then request a bulk export from the backend
+async function exportAll() {
+  if (!ptaTableCurrentYear.value) return;
+
+  const year = ptaTableCurrentYear.value.getFullYear();
+  // sort by levelYear, levelType, name
+  const exportPtas = ptaTableValues.value.filter(pta => pta.startYear === year).map(pta => pta.id)
+      .sort((a, b) => {
+        const ptaA = ptaTableValues.value.find(pta => pta.id === a);
+        const ptaB = ptaTableValues.value.find(pta => pta.id === b);
+        if (ptaA.level.type !== ptaB.level.type) {
+          return ptaA.level.type.localeCompare(ptaB.level.type);
+        }
+        if (ptaA.level.year !== ptaB.level.year) {
+          return ptaA.level.year.toString().localeCompare(ptaB.level.year.toString());
+        }
+        return ptaA.name.localeCompare(ptaB.name);
+      });
+
+  if (!exportPtas.length) return;
+
+  const response = await fetch(`${import.meta.env.VITE_API_HOST}/api/pta/export`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    credentials: 'include',
+    body: JSON.stringify({ ptaIds: exportPtas })
+  });
+
+  if (!response.ok) {
+    console.error('Failed to export PTAs');
+    return;
+  }
+
+  const blob = await response.blob();
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `PTA_Export_${year}.pdf`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  window.URL.revokeObjectURL(url);
 }
 </script>

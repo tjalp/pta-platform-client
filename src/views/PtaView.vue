@@ -21,6 +21,7 @@
                             <div class="lg:hidden">
                                 <Button icon="pi pi-bars" class="mr-2" text @click="drawerVisible = true" />
                             </div>
+                            <Button as="a" :href="downloadUrl" icon="pi pi-fw pi-download" label="Download PDF" severity="secondary" text />
                             <!-- <Button v-if="hasEditRights" icon="pi pi-plus" class="mr-2" severity="secondary" label="Toets toevoegen" text @click="addTest" /> -->
                         </template>
                         <template #center>
@@ -116,6 +117,13 @@ const menuItems = ref([
         items: []
     }
 ])
+const downloadUrl = computed(() => {
+    if (ptaData.value === null) {
+        return ''
+    }
+
+    return `${import.meta.env.VITE_API_HOST}/api/pta/${ptaData.value.id}/export`
+})
 
 function wasEdited() {
   console.log('wasEdited', fetchedPtaData.value, ptaData.value)
