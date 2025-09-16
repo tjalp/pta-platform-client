@@ -2,7 +2,7 @@
     <div>
         <ProgressBar v-if="ptaData === null || types === null || durations === null || resultTypes === null" mode="indeterminate" style="height: 6px" />
         <div v-else>
-            <Message v-if="!ptaData.finished" severity="warn" class="mb-4">
+            <Message v-if="!ptaData.finished" severity="warn" icon="pi pi-exclamation-circle" class="mb-4">
                 <strong>Let op:</strong> Dit PTA is nog niet afgerond. Dit betekent dat het PTA nog niet definitief is en dat er nog wijzigingen kunnen worden aangebracht.
             </Message>
             <div class="flex">

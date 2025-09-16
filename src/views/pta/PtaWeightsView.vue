@@ -2,11 +2,13 @@
     <ConfirmPopup />
     <div>
         <h1 class="text-2xl mb-4">Wegingen</h1>
+        <Message v-if="isEditMode && canEditAll" icon="pi pi-exclamation-triangle" severity="warn" class="mb-4"><b>Let op!</b> Jij, als administratief medewerker, kan wegingen van vorige jaren aanpassen. Zorg dat je goed oplet! Alle wegingen van vorige jaren zijn met <i class="pi pi-exclamation-circle"></i> aangegeven.</Message>
         <Message v-if="errorMessage" severity="error" class="mb-4">{{errorMessage}}</Message>
-        <div v-for="(level, index) in weightLevels" :key="index" class="mb-4 max-w-64">
+        <div v-for="(level, index) in weightLevels" :key="index" class="mb-4 max-w-64 flex gap-4">
+            <Message v-if="isEditMode && canEditAll && ptaData.level.year > level.year" icon="pi pi-exclamation-circle" severity="warn" variant="simple"></Message>
             <InputGroup>
                 <InputGroupAddon>{{ level.label }}</InputGroupAddon>
-                <InputNumber v-model="ptaData.weights[index]" showButtons :min="0" :max="100" :step="1" :disabled="!isEditMode || (ptaData.level.year > level.year)" />
+                <InputNumber v-model="ptaData.weights[index]" showButtons :min="0" :max="100" :step="1" :disabled="!isEditMode || (!canEditAll && (ptaData.level.year > level.year))" />
                 <InputGroupAddon>%</InputGroupAddon>
             </InputGroup>
         </div>
@@ -20,6 +22,8 @@ import InputGroupAddon from 'primevue/inputgroupaddon';
 import Message from 'primevue/message';
 import {computed, ref, watch} from "vue";
 import ConfirmPopup from "primevue/confirmpopup";
+import {useUserStore} from "@/stores/user.js";
+import {getUserPermissions} from "@/config/roles.js";
 
 const props = defineProps({
     ptaData: {
@@ -34,6 +38,19 @@ const props = defineProps({
 })
 
 const errorMessage = ref(null)
+const userStore = useUserStore()
+
+const canEditAll = computed(() => {
+  const user = userStore.user;
+
+  if (user === null) {
+    return false
+  }
+
+  const permissions = getUserPermissions(user)
+
+  return permissions.includes('pta:edit:all')
+})
 
 const weightLevels = computed(() => {
   if (!props.ptaData || !props.ptaData.level || !props.ptaData.weights) {
