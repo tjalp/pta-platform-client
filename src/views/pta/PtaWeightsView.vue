@@ -79,6 +79,13 @@ const weightLevels = computed(() => {
 });
 
 watch(props.ptaData.weights, (newWeights) => {
+    // Make sure weights is never undefined, instead make it 0
+    for (let i = 0; i < newWeights.length; i++) {
+      if (newWeights[i] === undefined || newWeights[i] === null) {
+        newWeights[i] = 0;
+      }
+    }
+
     const newWeightsTotal = newWeights.reduce((acc, weight) => acc + weight, 0);
 
     if (newWeightsTotal > 100) {
