@@ -15,7 +15,7 @@
           <div>
             <DatePicker v-model="ptaTableCurrentYear" view="year" dateFormat="yy" showIcon iconDisplay="input" placeholder="Selecteer een Jaar" />
           </div>
-          <Button icon="pi pi-fw pi-download" label="Download PDFs" severity="secondary" @click="exportAll" />
+          <Button icon="pi pi-fw pi-download" label="Download PDFs" severity="secondary" :loading="waitingOnExport" @click="exportAll" />
         </div>
         <ProgressBar v-if="loadingPtaTable" mode="indeterminate" style="height: 6px" />
         <PtaTable v-else :ptas="ptaTableValues" />
@@ -66,6 +66,7 @@ const canViewPtaTable = computed(() => {
 const ptas = ref([]);
 const fetching = ref(true);
 const loadingPtaTable = ref(false);
+const waitingOnExport = ref(false);
 const availableYears = computed(() => {
   if (!user || !ptas.value.length) return [];
 
@@ -140,6 +141,8 @@ async function exportAll() {
 
   if (!exportPtas.length) return;
 
+  waitingOnExport.value = true;
+
   const response = await fetch(`${import.meta.env.VITE_API_HOST}/api/pta/export`, {
     method: 'POST',
     headers: {
@@ -151,6 +154,7 @@ async function exportAll() {
 
   if (!response.ok) {
     console.error('Failed to export PTAs');
+    waitingOnExport.value = false;
     return;
   }
 
@@ -163,5 +167,7 @@ async function exportAll() {
   a.click();
   a.remove();
   window.URL.revokeObjectURL(url);
+
+  waitingOnExport.value = false;
 }
 </script>
