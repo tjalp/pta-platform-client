@@ -110,3 +110,6 @@ export const LOADING_STATES = {
   SUCCESS: 'success',
   ERROR: 'error'
 }
+
+// Levels
+export const LEVELS = ['6 VWO', '5 VWO', '4 VWO', '5 HAVO', '4 HAVO', '4 MAVO', '3 MAVO']

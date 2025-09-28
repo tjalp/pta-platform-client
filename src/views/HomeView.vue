@@ -15,7 +15,12 @@
           <div>
             <DatePicker v-model="ptaTableCurrentYear" view="year" dateFormat="yy" showIcon iconDisplay="input" placeholder="Selecteer een Jaar" />
           </div>
-          <Button icon="pi pi-fw pi-download" label="Download PDFs" severity="secondary" :loading="waitingOnExport" @click="exportAll" />
+          <div>
+            <InputGroup>
+              <Select v-model="selectedExportLevel" :options="levels" optionLabel="label" placeholder="Niveau" />
+              <Button icon="pi pi-fw pi-download" label="Download PDF" severity="primary" :loading="waitingOnExport" :disabled="!selectedExportLevel" @click="exportAll" />
+            </InputGroup>
+          </div>
         </div>
         <ProgressBar v-if="loadingPtaTable" mode="indeterminate" style="height: 6px" />
         <PtaTable v-else :ptas="ptaTableValues" />
@@ -51,10 +56,13 @@ import {RouterLink} from "vue-router";
 import Tag from "primevue/tag";
 import ProgressBar from "primevue/progressbar";
 import {useUserStore} from "@/stores/user.js";
-import {computed, ref, watch, watchEffect} from 'vue';
+import {computed, ref, watchEffect} from 'vue';
 import PtaTable from "@/components/PtaTable.vue";
 import {getUserPermissions} from "@/config/roles.js";
 import DatePicker from "primevue/datepicker";
+import InputGroup from "primevue/inputgroup";
+import InputGroupAddon from "primevue/inputgroupaddon";
+import {LEVELS} from "@/constants/index.js";
 
 const userStore = useUserStore();
 const user = computed(() => userStore.user);
@@ -74,6 +82,15 @@ const availableYears = computed(() => {
 })
 const ptaTableCurrentYear = ref(new Date());
 const ptaTableValues = ref([]);
+const selectedExportLevel = ref();
+const levels = computed(() => {
+  // Return all levels by object, with a label, levelYear and levelType, by splitting the LEVELS constant
+  return LEVELS.map(level => ({
+    label: level,
+    year: parseInt(level.split(' ')[0]),
+    type: level.split(' ')[1]
+  }));
+})
 
 watchEffect(async () => {
   if (!user.value) {
@@ -126,7 +143,9 @@ async function exportAll() {
 
   const year = ptaTableCurrentYear.value.getFullYear();
   // sort by levelYear, levelType, name
-  const exportPtas = ptaTableValues.value.filter(pta => pta.startYear === year).map(pta => pta.id)
+  const exportPtas = ptaTableValues.value.filter(pta => {
+    return pta.startYear === year && pta.level.year === selectedExportLevel.value.year && pta.level.type === selectedExportLevel.value.type
+  }).map(pta => pta.id)
       .sort((a, b) => {
         const ptaA = ptaTableValues.value.find(pta => pta.id === a);
         const ptaB = ptaTableValues.value.find(pta => pta.id === b);
@@ -162,7 +181,7 @@ async function exportAll() {
   const url = window.URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `PTA_Export_${year}.pdf`;
+  a.download = `PTA Export ${selectedExportLevel.value.label} ${year}-${year+1}.pdf`;
   document.body.appendChild(a);
   a.click();
   a.remove();
