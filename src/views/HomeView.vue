@@ -18,7 +18,7 @@
           <div>
             <InputGroup>
               <Select v-model="selectedExportLevel" :options="levels" optionLabel="label" placeholder="Niveau" />
-              <Button icon="pi pi-fw pi-download" label="Download PDF" severity="primary" :loading="waitingOnExport" :disabled="!selectedExportLevel" @click="exportAll" />
+              <Button icon="pi pi-fw pi-download" label="Download PDF" severity="primary" :loading="waitingOnExport" :disabled="!selectedExportLevel || waitingOnExport" @click="exportAll" />
             </InputGroup>
           </div>
         </div>
